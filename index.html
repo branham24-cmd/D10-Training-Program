@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>D-10 Trainer</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="D-10">
+<meta name="theme-color" content="#0B0F14">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAACfklEQVR42u3dMWrCYBiA4Vq6OQjF0UWX4lAQRejQvXvxEJ7AQ3gCDyHdu3coiCJ0kC52cRa8QbcgofwmP5qqeZ75Swvx5fsdolaqtfoN/OXWLUAciIPjuXMLLsWm3wkPNGbL4/7HijekV5DFiRJxrCCOcqyNiHlxIA7EgTgQB+JAHIgDcSAOEAfiQByIg3/iSbCibUft8MD9eCUOWYTGziERxwriuJC1ET0vDsSBOBAH4kAciAPEgTgQB+JAHIgDcSAOroYnwSLt5t3wQK23EIcsQmMXnYhjBXEUuzai58WBOBAH4kAcIA7EgTgQB+JAHIgDcSAOSqPsD/tMVs3wwLD9Iw5ZhMbKmYhjBXFErY3oeXEgDsQB4kAciANxIA7EgTgQB+JAHCAOxEG0K3kSrPUxDQ+snwde7NLFcTCL/TGJOFYQR+a1ET0vDhAH4kAciANxIA7EgTgQB+IAcSAOxIE4KN55PQn28P4ZHvh+efKalS6Og1nsj0nEsYI4Mq+N6HlsDsSBOBAH4kAciANxIA4QB+JAHIgDcXB+TvKwz+PbJjzw9dpw60sXx8Es9sck4lhBHJnXRvQ8NgfiQByIA3EgDhAH4kAciANxIA7EgTgQB+JAHCAOxIE4EAfiQByUM468n2BL5vN+l3kyv34e5LowmR+2f3JdmMzXeotcFybz9+NVrguT+cZsmevCvPM2BzEq1Vr96H80+oPU0T+p0fqYZtwZKZNVM+POSNnNuxl3Rsp21M64M1I2/U5hO+OEceA9B+JAHCAOxIE4EAfiQByIA3EgDsQB4kAciANxIA7EgTgQB+JAHIjDLUAciANxIA7EgTgQB+JAHIgD0n4Bn9N1PWow0VEAAAAASUVORK5CYII=">
+<style>
+  :root{
+    --bg:#0B0F14; --panel:#141B24; --panel2:#1B2431; --panel3:#212C3B;
+    --line:#273241; --line2:#31404F;
+    --ink:#E9EEF4; --muted:#8B98AA; --muted2:#5C6A7C;
+    --acc:#38BDF8; --acc-ink:#04121A;
+    --ok:#3ED598; --warn:#FDBB4B;
+    --r:14px; --r2:10px;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+  body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  button{font-family:inherit;color:inherit;cursor:pointer}
+  input{font-family:var(--mono)}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px}
+
+  header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(11,15,20,.96),rgba(11,15,20,.82));
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+  .top{display:flex;align-items:center;gap:12px;height:56px}
+  .brand{font-weight:800;letter-spacing:.14em;font-size:13px;text-transform:uppercase}
+  .brand b{color:var(--acc)}
+  .ctx{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted);
+    display:flex;gap:8px;align-items:center;text-transform:uppercase;letter-spacing:.04em}
+  .ctx .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2)}
+  h1{font-size:26px;letter-spacing:-.01em;margin:.15em 0 .1em;font-weight:800}
+  .sub{color:var(--muted);font-size:13px;line-height:1.5}
+
+  .spine{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+  .per{position:relative;display:flex;align-items:stretch;gap:14px;background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;overflow:hidden;
+    transition:transform .12s ease,border-color .12s ease}
+  .per:active{transform:scale(.992)}
+  .per .rail{width:4px;border-radius:4px;background:var(--pc)}
+  .per .bars{width:44px;display:flex;align-items:flex-end;gap:3px;opacity:.9}
+  .per .bars i{flex:1;border-radius:2px 2px 0 0;background:var(--pc);display:block}
+  .per .meta{flex:1;min-width:0}
+  .per .pname{font-weight:800;font-size:16px;letter-spacing:.01em}
+  .per .pphase{color:var(--pc);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  .per .pdates{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+  .per .pgo{align-self:center;color:var(--muted2);font-size:20px}
+  .per[data-current="1"]{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc) inset,0 8px 30px -18px var(--pc)}
+  .tagcur{position:absolute;top:0;right:0;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
+    background:var(--pc);color:#04121A;padding:3px 8px;border-bottom-left-radius:8px;font-weight:700}
+
+  .weeks{display:flex;gap:8px;margin:16px 0 6px;flex-wrap:wrap}
+  .pip{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;border:1px solid var(--line2);
+    background:var(--panel);color:var(--muted);border-radius:999px;padding:8px 14px;font-weight:600;transition:all .12s ease}
+  .pip[data-on="1"]{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:800}
+
+  .days{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+  .day{display:flex;align-items:center;gap:13px;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--r);padding:13px 14px;transition:transform .12s ease}
+  .day:active{transform:scale(.992)}
+  .day .dow{font-family:var(--mono);font-size:11px;color:var(--muted2);width:30px;text-transform:uppercase;letter-spacing:.06em}
+  .day .dbody{flex:1;min-width:0}
+  .day .dname{font-weight:700;font-size:15px}
+  .day .dtype{color:var(--muted);font-size:12px;margin-top:2px}
+  .day .dchip{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 7px;border-radius:6px;border:1px solid var(--line2);color:var(--muted)}
+  .day.off{opacity:.5}
+  .day.off .dname{font-weight:600;color:var(--muted)}
+  .kindLift{--k:var(--acc)} .kindCond{--k:#8B5CF6} .kindCardio{--k:#3ED598} .kindField{--k:#FDBB4B}
+  .day .kbar{width:3px;align-self:stretch;border-radius:3px;background:var(--k,var(--acc))}
+  .dprog{width:26px;height:26px;position:relative;flex:none}
+  .ring{transform:rotate(-90deg)} .ring .bg{stroke:var(--line2)} .ring .fg{stroke:var(--acc);transition:stroke-dashoffset .3s ease}
+
+  .backrow{display:flex;align-items:center;gap:10px;margin:14px 0 2px}
+  .back{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);
+    background:var(--panel);border-radius:999px;padding:7px 13px}
+  .dayhead{margin:6px 0 2px}
+  .dayhead .focus{color:var(--acc);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.09em}
+
+  details.prep{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);margin-top:14px;overflow:hidden}
+  details.prep>summary{list-style:none;cursor:pointer;padding:14px 15px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px}
+  details.prep>summary::-webkit-details-marker{display:none}
+  details.prep>summary .tw{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);transition:transform .2s}
+  details.prep[open]>summary .tw{transform:rotate(90deg)}
+  .prep .pbody{padding:2px 15px 14px;border-top:1px solid var(--line)}
+  .prow{display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px;line-height:1.45}
+  .prow:last-child{border-bottom:0}
+  .prow .pl{flex:1;color:var(--ink)} .prow .pv{font-family:var(--mono);font-size:12px;color:var(--acc);white-space:nowrap;align-self:center}
+  .note-lite{color:var(--muted);font-size:12.5px;font-style:italic;margin-top:10px;line-height:1.5}
+
+  .ex{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);margin-top:14px;overflow:hidden}
+  .ex .xh{display:flex;gap:12px;padding:14px 15px 12px;align-items:flex-start}
+  .badge{width:30px;height:30px;border-radius:9px;background:var(--acc);color:var(--acc-ink);font-weight:800;
+    display:grid;place-items:center;font-size:13px;flex:none;font-family:var(--mono)}
+  .badge.alt{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+  .badge.jump{background:transparent;color:var(--warn);border:1px solid var(--warn)}
+  .xh .xt{flex:1;min-width:0}
+  .xname{font-weight:800;font-size:16px;letter-spacing:-.005em;line-height:1.25}
+  .xnote{color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:5px}
+
+  .rx{display:flex;gap:8px;flex-wrap:wrap;padding:0 15px 12px}
+  .rxcell{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r2);padding:8px 11px;min-width:64px}
+  .rxcell .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+  .rxcell .v{font-family:var(--mono);font-size:16px;font-weight:700;margin-top:2px}
+  .rxcell.big{flex:1} .rxcell.big .v{color:var(--acc);font-size:15px}
+  .rest-btn{margin-left:auto;display:flex;align-items:center;gap:7px;align-self:stretch;
+    background:var(--panel2);border:1px solid var(--line2);border-radius:var(--r2);padding:0 13px;font-family:var(--mono);
+    font-size:12px;color:var(--ink)}
+  .rest-btn b{color:var(--acc)}
+  .xc{font-family:var(--mono);font-size:11px;color:var(--muted2);padding:0 15px 11px;margin-top:-2px}
+  .xc b{color:var(--warn)}
+
+  .sets{border-top:1px solid var(--line);padding:6px 8px 10px}
+  .setrow{display:grid;grid-template-columns:34px 1fr 1fr 40px;gap:8px;align-items:center;padding:5px 7px;border-radius:10px}
+  .setrow.metric{grid-template-columns:34px 1fr 40px}
+  .setrow.head{padding-top:8px;padding-bottom:2px}
+  .setrow.head span{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);text-align:center}
+  .setrow.head .sh-lbl{text-align:left;padding-left:4px}
+  .setno{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:700;text-align:center}
+  .setrow input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;
+    color:var(--ink);font-size:15px;padding:9px 6px;text-align:center;outline:none}
+  .setrow input::placeholder{color:var(--muted2)}
+  .setrow input:focus{border-color:var(--acc);background:#0e1620}
+  .setrow.done input{border-color:transparent;background:rgba(62,213,152,.09);color:var(--ok)}
+  .chk{width:34px;height:34px;border-radius:9px;border:1px solid var(--line2);background:var(--panel2);
+    display:grid;place-items:center;color:var(--muted2);font-size:15px;justify-self:center}
+  .setrow.done .chk{background:var(--ok);color:#04140C;border-color:var(--ok)}
+  .lastwk{grid-column:2 / 4;font-family:var(--mono);font-size:10.5px;color:var(--muted2);padding:0 4px 3px;letter-spacing:.02em}
+  .lastwk b{color:var(--muted)}
+  .addset{margin:2px 7px 4px;width:calc(100% - 14px);background:transparent;border:1px dashed var(--line2);
+    color:var(--muted);border-radius:9px;padding:8px;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em}
+
+  .circuit{border-top:1px solid var(--line);padding:12px 15px}
+  .citem{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;line-height:1.4}
+  .citem:last-child{border-bottom:0} .citem .cn{font-family:var(--mono);color:var(--acc);font-size:12px;flex:none}
+  .rounds{display:flex;align-items:center;gap:12px;margin-top:12px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .stepper{display:flex;align-items:center;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+  .stepper button{width:38px;height:36px;background:var(--panel2);border:0;font-size:18px;color:var(--ink)}
+  .stepper .val{width:40px;text-align:center;font-family:var(--mono);font-weight:700;font-size:15px}
+
+  .cond{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);margin-top:14px;overflow:hidden}
+  .cond .ch{padding:14px 15px 6px}
+  .cond .ct{font-weight:800;font-size:16px} .cond .cs{color:var(--muted);font-size:12.5px;margin-top:4px;line-height:1.45}
+  .interval-btn{margin:10px 15px 4px;display:flex;align-items:center;justify-content:center;gap:9px;
+    background:var(--panel2);border:1px solid var(--acc);color:var(--acc);border-radius:11px;padding:12px;
+    font-weight:700;font-size:14px;width:calc(100% - 30px)}
+  .series-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    margin:12px 15px 2px;display:flex;gap:8px;align-items:center}
+  .series-h .o{color:var(--warn)}
+  .reps{padding:2px 12px 14px}
+  .rep{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r2);padding:11px 12px;margin:8px 0}
+  .rep .rhd{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .rep .rl{font-weight:700;font-size:14px} .rep .rl small{color:var(--muted);font-weight:600;font-family:var(--mono);font-size:11px;margin-left:6px}
+  .rep .rt{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:6px;border:1px solid var(--line2);color:var(--warn)}
+  .rep .rtimer{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--acc);border:1px solid var(--line2);border-radius:999px;padding:5px 11px;background:var(--panel)}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .fld{display:flex;flex-direction:column;gap:4px}
+  .fld label{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
+  .fld input{background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:8px;font-size:14px;text-align:center;outline:none}
+  .fld input:focus{border-color:var(--acc)}
+
+  nav{position:fixed;left:0;right:0;bottom:0;z-index:45;background:rgba(13,18,25,.94);backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+  .navin{max-width:640px;margin:0 auto;display:flex}
+  .navbtn{flex:1;background:transparent;border:0;padding:11px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted2)}
+  .navbtn .ni{font-size:19px;line-height:1} .navbtn .nl{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase}
+  .navbtn[data-on="1"]{color:var(--acc)}
+
+  .scrim{position:fixed;inset:0;z-index:60;background:rgba(6,9,13,.72);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
+  .scrim[data-open="1"]{display:flex}
+  .sheet{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--line2);border-radius:22px 22px 0 0;
+    padding:20px 18px calc(26px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px -20px #000}
+  .sheet h3{margin:0 0 2px;font-size:14px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .clock{display:grid;place-items:center;margin:10px 0 6px}
+  .clock svg{transform:rotate(-90deg)}
+  .clock .rbg{stroke:var(--line2)} .clock .rfg{stroke:var(--acc);transition:stroke-dashoffset .95s linear}
+  .clock .time{position:absolute;font-family:var(--mono);font-size:44px;font-weight:700;letter-spacing:.02em}
+  .clock .phase{position:absolute;margin-top:78px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .tctrls{display:flex;gap:10px;margin-top:14px}
+  .tbtn{flex:1;border:1px solid var(--line2);background:var(--panel2);border-radius:12px;padding:14px;font-weight:700;font-size:15px}
+  .tbtn.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+  .tadj{display:flex;gap:8px;justify-content:center;margin-top:12px}
+  .tadj button{font-family:var(--mono);font-size:12px;border:1px solid var(--line2);background:var(--panel2);border-radius:999px;padding:8px 14px;color:var(--muted)}
+  .close-x{position:absolute;top:14px;right:16px;font-size:22px;color:var(--muted2);background:none;border:0}
+
+  .infobox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-top:14px;line-height:1.55;font-size:13.5px;color:var(--muted)}
+  .infobox b{color:var(--ink)} .infobox h4{margin:16px 0 6px;color:var(--ink);font-size:14px} .infobox h4:first-child{margin-top:0}
+  .reset{margin-top:14px;width:100%;background:transparent;border:1px solid var(--line2);color:var(--muted);border-radius:10px;padding:11px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+  .foot{text-align:center;color:var(--muted2);font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;margin:26px 0 8px;text-transform:uppercase}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap top">
+  <div class="brand">D&#8209;10 <b>TRAINER</b></div>
+  <div class="ctx" id="ctx"></div>
+</div></header>
+<main class="wrap" id="view"></main>
+<nav><div class="navin">
+  <button class="navbtn" data-nav="today"><span class="ni">&#9678;</span><span class="nl">Today</span></button>
+  <button class="navbtn" data-nav="program"><span class="ni">&#9636;</span><span class="nl">Program</span></button>
+  <button class="navbtn" data-nav="info"><span class="ni">&#8505;</span><span class="nl">Info</span></button>
+</div></nav>
+<div class="scrim" id="scrim"><div class="sheet">
+  <button class="close-x" onclick="Timer.close()">&times;</button>
+  <h3 id="tmr-title">Rest</h3>
+  <div class="clock" style="position:relative">
+    <svg width="200" height="200" viewBox="0 0 200 200">
+      <circle class="rbg" cx="100" cy="100" r="88" fill="none" stroke-width="10"/>
+      <circle class="rfg" id="tmr-arc" cx="100" cy="100" r="88" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="552.9" stroke-dashoffset="0"/>
+    </svg>
+    <div class="time" id="tmr-time">0:00</div><div class="phase" id="tmr-phase"></div>
+  </div>
+  <div class="tadj" id="tmr-adj"><button onclick="Timer.adjust(-30)">&#8722;30s</button><button onclick="Timer.adjust(30)">+30s</button></div>
+  <div class="tctrls"><button class="tbtn" onclick="Timer.reset()">Reset</button><button class="tbtn primary" id="tmr-toggle" onclick="Timer.toggle()">Start</button></div>
+</div></div>
+
+<script>
+/* ===== helpers to keep data compact ===== */
+const R=(work,rest,opt)=>({work,rest:rest||'',opt:!!opt});
+const S=(name,reps,opt)=>({name:name||'',opt:!!opt,reps});
+
+/* ===================== PROGRAM DATA ===================== */
+const ACC=['#38BDF8','#2DD4BF','#A3E635','#FDE047','#FB923C','#F87171','#EF4444'];
+const PERIODS=[
+  {id:'P1',name:'Intro / GPP',phase:'Accumulation',dates:'Oct 2018',weeks:2,accent:ACC[0]},
+  {id:'P2',name:'Hypertrophy 1',phase:'Hypertrophy',dates:'Oct 2018',weeks:4,accent:ACC[1]},
+  {id:'P3',name:'Hypertrophy 2',phase:'Hypertrophy',dates:'Nov 2018',weeks:4,accent:ACC[2]},
+  {id:'P4',name:'Strength 1',phase:'Strength',dates:'Jan 2019',weeks:3,accent:ACC[3]},
+  {id:'P5',name:'Power / Strength',phase:'Power',dates:'Mar 2019',weeks:3,accent:ACC[4]},
+  {id:'P6',name:'Realization',phase:'Realization',dates:'May 2019',weeks:3,accent:ACC[5]},
+  {id:'P7',name:'Last Kick',phase:'Peak',dates:'Jul 2019',weeks:3,accent:ACC[6]},
+];
+const HRF=['Max HR','Avg HR','Distance','HR after rest'];
+const RUNF=['Time','Max HR','Avg HR','HR after rest'];
+
+/* ---------- P1 ---------- */
+const P1={
+ sched:[['Mon','lift1',['Linear Speed','Total Body Lift']],['Tue','aerobic',['Aerobic Capacity']],
+  ['Wed','lift2',['COD','Total Body Lift']],['Thu','esd',['Long Aerobic Power Intervals']],
+  ['Fri',null,['Off']],['Sat','lift3',['Top-End Speed','Total Body Lift']],['Sun',null,['Off']]],
+ days:{
+  lift1:{name:'Lift 1',dow:'Mon',session:'Lower Body Strength',focus:'Linear Acceleration',kind:'lift',
+    prep:[['Session 1 — Linear Acceleration (sub-max · high volume)'],['General warm-up — linear, dynamic flex / movement prep'],['Low-amplitude jumps — pogo, short ground contact',{1:'4 × 10',2:'4 × 15'}],
+      ['Speed skill — march, skip, high knee + lean + sprint','2–3 ea'],['Start work — stance, first drive step']],
+    ex:[{c:'A',name:'Squat',note:"Move it fast — high effort. Bar speed should hold set 1 to the last set.",tempo:'3011',rest:'3–4 min',restSec:210,warmup:'135×10 · 185×5 · 225×1',w:{1:['2','12'],2:['3','10']}},
+      {c:'B',name:'Power Clean (from hang)',note:'Explosive & technical — nothing heavy. Stick the landings.',tempo:'10X1',rest:'1–2 min',restSec:90,w:{1:['4','2–3'],2:['6','2–3']}},
+      {c:'C',name:'Push-Up (weighted)',note:'Set 1 AMRAP, then match the total with short rests. e.g. 45 lb.',tempo:'2011',rest:'2–3 min',restSec:150,w:{1:['1+3','AMRAP + total'],2:['1+4','AMRAP + total']}},
+      {c:'D',name:'Hamstring — eccentric',note:'GHR · ecc-only GHR · glute-ext.',tempo:'4011',rest:'Short',restSec:45,xc:'12–15',w:{1:['3','up to 8'],2:['4','up to 8']}}],
+    circuit:{title:'Finisher — 2–3 rounds',items:['Push-up / triceps 1.5s — 8+','Reverse hyper — up to 20','MB single-side deadbug — up to 10 ea']},
+    outro:'Extra time: anterior core, static stretch, upper corrective / light pulls, tissue work.'},
+  aerobic:{name:'Aerobic Capacity',dow:'Tue',session:'Cardiac Output',focus:'Steady State',kind:'cardio',
+    desc:'30–60 min steady low-HR work at 120–140 bpm. Bike, row, swim, hike — hold HR constant. (Avoid jogging early if possible.)',
+    timer:{work:1800,rest:0,rounds:1,label:'30-min steady'},logf:['Time (min)','Avg HR']},
+  lift2:{name:'Lift 2',dow:'Wed',session:'Upper Body Strength',focus:'Pro Agility · L · Decel',kind:'lift',
+    prep:[['Session 1 — Pro Agility, L & Decel (sub-max · high volume)'],['General warm-up — lateral, dyn flex'],['Deceleration prep — “hold”, “push”, “shift”'],
+      ['Decel technique — shuffle→stop, crossover→stop, crossover→shuffle→stop','2× ea way'],
+      ['Pogo jumps / single-leg hops',{1:'4–6 × 20',2:'6–8 × 20'}],['ISO lower — split squat + lateral squat','min 2 min/leg']],
+    ex:[{c:'A',name:'Bench Press',note:'Main push — Swiss or straight bar.',tempo:'3011',rest:'2–4 min',restSec:180,w:{1:['2','12–15'],2:['3','10–12']}},
+      {c:'B',name:'Chin-Up (neutral)',tempo:'3010',rest:'2–4 min',restSec:180,w:{1:['3–4','up to 12'],2:['4–5','up to 12']}},
+      {c:'C',name:'DB Row — chest supported',tempo:'3010',rest:'2 min',restSec:120,w:{1:['4–6','8–12'],2:['5–8','8–12']}}],
+    circuit:{title:'Circuit — 2–3 rounds',items:['Push-up / triceps — 8+','Reverse hyper — up to 20','MB deadbug — up to 10 ea']}},
+  esd:{name:'Long Aerobic Power Intervals',dow:'Thu',session:'Energy System Dev',focus:'Row · 4 × 8',kind:'cond',
+    cond:{title:'Long “Aerobic” Power Intervals (4 × 8)',desc:'Row for max sustainable effort — 8-min reps, 2-min rest.',fields:HRF,timer:{work:480,rest:120,label:'8 min row · 2 min rest'},
+      wk:{1:[S('',[R('8 min','2 min'),R('8 min','2 min')])],2:[S('',[R('8 min','2 min'),R('8 min','2 min'),R('8 min','2 min',true)])]}}},
+  lift3:{name:'Lift 3',dow:'Sat',session:'Lower Body — Hyper',focus:'Linear Accel · Top-End',kind:'lift',
+    prep:[['Session 1 — Linear Acceleration, Top-End (sub-max · high volume)'],['General warm-up — linear'],['Plyo series — skip H/D, bound, straight-leg bound',{1:'2 of ea × field',2:'3 of ea × field'}],
+      ['Wall series — knee drive','2–3 ea'],['Start work'],['Long accels — 85–90%, hill/outside',{1:'2 × 4–5 (25–30 yd)',2:'3 × 4–5 (35–40 yd)'}]],
+    ex:[{c:'A',name:'Overhead Press',note:'OH bar · DB single-arm · landmine · KB.',tempo:'3011',rest:'2 min',restSec:120,w:{1:['2–3','8–10'],2:['3–4','8–10']}},
+      {c:'B',name:'Explosive (mod load)',note:'Power clean · power snatch · pull · or light loaded jump ≤40% squat 1RM.',tempo:'20X1',rest:'<2 min',restSec:90,w:{1:['Build','1–3'],2:['Build','1–3']}},
+      {c:'C',name:'Barbell Hip Thrust',tempo:'2011',rest:'2 min',restSec:120,w:{1:['3','12–15'],2:['4','12–15']}},
+      {c:'D',name:'Single-leg variation',note:'Reverse lunge · Bulgarian · step-up.',tempo:'2011',rest:'1–2 min b/w legs',restSec:90,w:{1:['2','10–12 ea'],2:['3','8–10 ea']}}],
+    circuit:{title:'Finisher',items:['Pull of choice — row / chin / lat','Fun & guns — or press','250 m row — for time']}},
+ }};
+
+/* ---------- P2 ---------- */
+const P2={
+ sched:[['Mon','lift1',['Linear Speed','Lower Lift']],['Tue','lift2',['Upper Lift','Row Repeat']],
+  ['Wed','aerobic',['Aerobic Capacity']],['Thu','lift3',['COD Speed','Lower Lift']],
+  ['Fri','lift4',['Upper Lift','opt Long Row']],['Sat','tempo',['Tempo Runs']],['Sun',null,['Off']]],
+ days:{
+  lift1:{name:'Lift 1',dow:'Mon',session:'Lower Body Hyper-Strength',focus:'Linear Acceleration',kind:'lift',
+    prep:[['Session 1 — Linear Acceleration (sub-max · high volume)'],['General warm-up — linear, dyn flex'],['Plyo series',{1:'2 of ea',2:'3 of ea',3:'3 of ea',4:'3 of ea'}],['Speed skill','2–3 ea × 25–30 yd'],['Start work'],
+      ['Short accels','10 yd×2 · 15 yd×2'],['Light resisted accels (rope)',{1:'3–4',2:'4–5',3:'4–5',4:'5–6'}]],
+    ex:[{c:'A',name:'Squat',note:'Move it fast. High effort.',tempo:'3011',rest:'3–4 min',restSec:210,warmup:'135×10 · 185×5 · 225×1',w:{1:['3','8'],2:['4','8'],3:['5','8'],4:['5','8']}},
+      {c:'B',name:'Light Loaded Jump',note:'≤25% squat 1RM — bar / DB / vest / bodyweight.',tempo:'10X1',rest:'1–2 min',restSec:90,w:{1:['4','5'],2:['6','5'],3:['6','4'],4:['6','4']}},
+      {c:'C',name:'Lunge',note:'Reverse or Bulgarian split squat.',tempo:'2011',rest:'2–3 min',restSec:150,w:{1:['2–3','12 ea'],2:['3–4','12 ea'],3:['3–4','15 ea'],4:['3–4','15 ea']}},
+      {c:'D',name:'Eccentric Hammy',note:'Nordic · ecc GHR · machine curl (ecc).',tempo:'4000 / 3011',rest:'2–3 min',restSec:150,xc:'8–10',w:{1:['2–3','4–5'],2:['3–4','4–5'],3:['3–4','4–5'],4:['3–4','4–5']}}],
+    outro:'Core: eccentric straight-leg deadbug — lower 1 leg 3s, raise 3s.'},
+  lift2:{name:'Lift 2',dow:'Tue',session:'Upper Body Strength — Hypertrophy',focus:'Row Repeat',kind:'lift',
+    ex:[{c:'A',name:'Bench Press — eccentric',note:'3s down, press, pause, reset. Don’t chase weight — phase 1.',tempo:'3111',rest:'2–4 min',restSec:180,w:{1:['3','5'],2:['4','5'],3:['5','5'],4:['5','5']}},
+      {c:'B',name:'DB Incline Bench Press',tempo:'2010',rest:'2 min',restSec:120,w:{1:['2–3','15–20'],2:['3–4','15–20'],3:['3–4','15–20'],4:['3–4','15–20']}},
+      {c:'C',name:'Cable Row — seated',note:'Or DB row (chest supported) / inverted row.',tempo:'3010',rest:'<2 min',restSec:100,w:{1:['5–6','12–15'],2:['6–8','12–15'],3:['6–8','12–15'],4:['6–8','12–15']}}],
+    circuit:{title:'Circuit — 2–3 rounds',items:['Posterior shoulder (T-row / face pull / rev fly) — 12+','Triceps pressdown — up to 10','Biceps of choice']},
+    cond:{title:'Long Aerobic Power Intervals (2–3 × 4 min)',desc:'Row for max sustainable effort — 4-min reps, 3-min rest.',fields:HRF,timer:{work:240,rest:180,label:'4 min row · 3 min rest'},
+      wk:{1:[S('',[R('4 min','3 min'),R('4 min','3 min')])],2:[S('',[R('4 min','3 min'),R('4 min','3 min'),R('4 min','3 min',true)])],
+        3:[S('',[R('4 min','3 min'),R('4 min','3 min'),R('4 min','3 min')])],4:[S('',[R('4 min','3 min'),R('4 min','3 min'),R('4 min','3 min')])]}}},
+  lift3:{name:'Lift 3',dow:'Thu',session:'Lower Body Hyper-Strength',focus:'COD · Pro Agility',kind:'lift',
+    prep:[['Session 1 — Pro Agility, L & Decel (near-max · mid-volume)'],['General warm-up — lateral, dyn flex'],['Deceleration prep','As needed'],['Decel technique — shuffle / crossover to stop','2× ea way'],['Pro agility & L — drill breakdown'],['Broad jump (in lift) — 90%',{1:'2×3',2:'3×3',3:'3×3',4:'3×4'}]],
+    ex:[{c:'J1',name:'Broad Jump',note:'Jump 3× (10s rest). Record best distance.',track:'metric',metric:'Distance',w:{1:['3','best']}},
+      {c:'A',name:'Olympic Variation',note:'Power clean (floor/hang) · power snatch (hang) · clean pull.',rest:'1–2 min',restSec:90,w:{1:['Build','Mod ×2'],2:['Build','Mod ×2'],3:['Build','Mod ×1'],4:['Build','Mod ×1']}},
+      {c:'B',name:'Bar-Loaded Single Leg',note:'Step-up 14–18″ · reverse · Bulgarian. Choose different from Mon.',tempo:'2011',rest:'1–2 min b/w legs',restSec:90,w:{1:['3','12–15 ea'],2:['4','10–12 ea'],3:['4','10–12 ea'],4:['5','8–10 ea']}},
+      {c:'C1',name:'Hamstring of Choice',note:'Machine · GHR · RDL · SL RDL.',tempo:'2011',rest:'Short',restSec:60,w:{1:['3–4','8–12'],2:['4–5','8–12'],3:['4–5','8–12'],4:['4–5','8–12']}},
+      {c:'C2',name:'Core — anti-rotation',note:'Tall-kneel band press-out.',rest:'Short',w:{1:['ALL','10–12']}}]},
+  lift4:{name:'Lift 4',dow:'Fri',session:'Upper Body Strength — Hypertrophy',focus:'Machines / Cables',kind:'lift',
+    ex:[{c:'A',name:'Bench Press — test simulation',note:'Hopeful reps; break into phases (slow → rest → repeat → quick bursts).',tempo:'2010',rest:'4–5 min',restSec:270,warmup:'BAR/95×10 · 135×5–6 · 185×1–3 · 205/225×1',w:{1:['2','TEST (no fail)'],2:['3','TEST (no fail)'],3:['3','TEST (fail 1st)'],4:['3','TEST (fail 1st)']}},
+      {c:'B',name:'Pull-Up / Chin-Up',note:'Set 1 AMRAP; match total with rest/pause.',tempo:'2010',rest:'As needed',restSec:120,w:{1:['1+2','AMRAP + total'],2:['1+3','AMRAP + total'],3:['1+3','AMRAP + total'],4:['1+3','AMRAP + total']}},
+      {c:'C',name:'1-Arm Cable Row — half kneel',tempo:'3010',rest:'1–2 min',restSec:90,w:{1:['3–4','8–12 ea'],2:['4–5','8–12 ea'],3:['4–5','8–12 ea'],4:['4–5','8–12 ea']}}],
+    circuit:{title:'Finisher',items:['Biceps — rope/EZ curl 12','Push-up or triceps — AMRAP','Face pull — 10–12 (2020)']},
+    outro:'Optional long row — 15–20 min.'},
+  aerobic:{name:'Aerobic Capacity',dow:'Wed',session:'Regen',focus:'Steady State',kind:'cardio',
+    desc:'Posture + hip mobility + core. 30–60 min steady low-HR (120–140 bpm). Foam roll + static stretch.',timer:{work:1800,rest:0,rounds:1,label:'30-min steady'},logf:['Time (min)','Avg HR']},
+  tempo:{name:'Tempo Runs',dow:'Sat',session:'Regen · Aerobic · Core',focus:'Tempo / Corrective',kind:'cardio',
+    desc:'Core/stability series (bear, high prone, rolling, get-up, halo). MB circuit + throws + crawling (1–3 rounds). Tempo runs: 100-yd stride (20s), walk 100 yd — 2 sets of 4 laps, build to 3–4. Foam roll + stretch.',logf:['Sets','Notes']},
+ }};
+
+/* ---------- P3 ---------- */
+const P3={
+ sched:[['Mon','lift1',['Linear Speed','Lower Lift']],['Tue','lift2',['Upper Lift','Lactic Row']],
+  ['Wed','aerobic',['Aerobic Capacity']],['Thu','lift3',['COD Speed','Lower Lift']],
+  ['Fri','lift4',['Upper Lift','opt Long ESD']],['Sat','tempo',['Tempo / Fartlek']],['Sun',null,['Off']]],
+ days:{
+  lift1:{name:'Lift 1',dow:'Mon',session:'Lower Body Hyper-Strength',focus:'Linear Accel · Sprint Complex',kind:'lift',
+    prep:[['Session 1 — Linear Acceleration (sub-max · high volume)'],['General warm-up — linear, dyn flex'],['Plyo series',{1:'2 of ea',2:'3 of ea',3:'3 of ea',4:'3 of ea'}],['Speed skill · start work'],['Short accels','10 yd×2 · 15 yd×2'],
+      ['Sprint complex — 2 resisted + 2 free (20 yd)',{1:'2 (2+2)',2:'2–3',3:'2–3',4:'2–3'}]],
+    ex:[{c:'J',name:'Power Clean (hang) / Loaded Jump',note:'Moderate — decent weight, don’t go nuts. ≤25% squat 1RM if jump.',tempo:'20X1',rest:'1–2 min',restSec:90,w:{1:['Build','Mod 2'],2:['Build','Mod 2'],3:['Build','Mod 1–2'],4:['Build','Mod 1–2']}},
+      {c:'A',name:'Squat',tempo:'2011',rest:'3–5 min',restSec:240,warmup:'135×10 · 185×5 · 225×1',w:{1:['5','5'],2:['4','4'],3:['4','4'],4:['3','3']}},
+      {c:'B1',name:'Hammy / Hip (choice)',note:'Nordic/GHR 5–8 · glute-ext 15–20 · hammy curl 8–12. Mix week to week.',rest:'Short',restSec:60,w:{1:['2–4','by choice'],2:['3–5','by choice'],3:['4–5','by choice'],4:['4–5','by choice']}},
+      {c:'B2',name:'Quad / Knee (choice)',note:'Reverse lunge · Bulgarian · step-up · leg-ext.',tempo:'2011',rest:'1–2 min',restSec:90,w:{1:['2–4','8–12'],2:['3–5','8–12'],3:['4–5','10–15'],4:['4–5','10–15']}}],
+    outro:'Core: hard anterior — roll-out/fall-out, eccentric candlestick, reverse crunch.'},
+  lift2:{name:'Lift 2',dow:'Tue',session:'Upper Body Strength — Hypertrophy',focus:'Lactic Row',kind:'lift',
+    ex:[{c:'A',name:'Bench Press — variation',note:'Wk1 closer-grip (2011) · Wk2 pause (2111) · Wk3 no-pause (2010) · Wk4 pause (2111).',tempo:'varies',rest:'2–4 min',restSec:180,w:{1:['3','10'],2:['2','5'],3:['3','8'],4:['2','3']}},
+      {c:'B',name:'DB Row — chest supported (incline)',tempo:'3010',rest:'2 min',restSec:120,w:{1:['4–5','8–12'],2:['5–6','8–12'],3:['5–6','8–10'],4:['5–6','8–10']}},
+      {c:'C',name:'Push-Up — ISO/Dynamic',note:'Hold 1s→1 rep, 2s→2 reps… until you can’t.',rest:'As needed',w:{1:['3–5','AMRAP'],2:['4–6','AMRAP'],3:['4–6','AMRAP'],4:['4–6','AMRAP']}}],
+    circuit:{title:'Circuit — 2–3 rounds',items:['Face pull — 8–12','Skull crusher — 8–12','Biceps (fat grip)']},
+    cond:{title:'Lactic Capacity Intervals (Row)',desc:'Row max sustainable effort for the given time. Work climbs each week.',fields:HRF,
+      wk:{1:[S('Series 1',[R('90 sec','90 sec'),R('90 sec','90 sec'),R('90 sec','4 min')]),S('Series 2',[R('90 sec','120 sec'),R('90 sec','120 sec'),R('90 sec','120 sec')],true)],
+        2:[S('Series 1',[R('105 sec','90 sec'),R('105 sec','90 sec'),R('105 sec','4 min')]),S('Series 2',[R('90 sec','105 sec'),R('90 sec','105 sec'),R('90 sec','105 sec')])],
+        3:[S('Series 1',[R('105 sec','75 sec'),R('105 sec','75 sec'),R('105 sec','4 min')]),S('Series 2',[R('105 sec','90 sec'),R('105 sec','90 sec'),R('105 sec','90 sec')])],
+        4:[S('Series 1',[R('120 sec','75 sec'),R('120 sec','75 sec'),R('120 sec','4 min')]),S('Series 2',[R('105 sec','90 sec'),R('105 sec','90 sec'),R('105 sec','90 sec')])]}}},
+  lift3:{name:'Lift 3',dow:'Thu',session:'Lower Body Hyper-Strength',focus:'COD',kind:'lift',
+    prep:[['Session 1 — Pro Agility, L & Decel (near-max · mid-volume)'],['General warm-up — lateral, dyn flex'],['Deceleration prep','As needed'],['Decel technique — shuffle / crossover to stop','2× ea way'],['Pro agility & L — drill breakdown'],['Broad jump (in lift) — 90%',{1:'2×3',2:'3×3',3:'3×3',4:'3×4'}]],
+    ex:[{c:'J1',name:'Broad Jump',note:'See first sheet. Record best distance.',track:'metric',metric:'Distance',w:{1:['3','best']}},
+      {c:'A1',name:'Snatch Pull (hang/floor)',note:'Jump & extend without bending arms. Heavy but fast.',rest:'Short',restSec:60,w:{1:['2–3','2'],2:['3–4','2'],3:['3–4','2'],4:['3–5','2']}},
+      {c:'A2',name:'Vertical Jump Practice',note:'Use a vertec. Record best height of the day.',track:'metric',metric:'Height',w:{1:['ALL','1+1+1']}},
+      {c:'B',name:'Single-Leg Squat',note:'Pistol to a box; load DBs/vest. Step-up if you can’t.',tempo:'3011',rest:'1 min b/w legs',restSec:60,w:{1:['2–3','up to 10 ea'],2:['3–4','up to 10 ea'],3:['3–4','up to 8 ea'],4:['3–4','up to 8 ea']}},
+      {c:'C1',name:'Barbell Hip Thrust',note:'Eyes on bar, neutral spine, pause at top. Heels/glutes/hammies.',tempo:'2111',rest:'Short',w:{1:['3–4','10–12'],2:['4–5','10–12'],3:['4–5','10–12'],4:['4–5','10–12']}},
+      {c:'C2',name:'Core — anti-rotation',note:'Standing tight rotations (band).',w:{1:['ALL','10–15 ea']}}]},
+  lift4:{name:'Lift 4',dow:'Fri',session:'Upper Body Strength — Hypertrophy',focus:'Machines / Cables',kind:'lift',
+    ex:[{c:'A',name:'Bench Press — test simulation',note:'2nd/3rd set: Wk1&3 slingshot · Wk2&4 board press.',tempo:'2010',rest:'4–5 min',restSec:270,warmup:'BAR/95×10 · 135×5–6 · 185×1–3 · 205/225×1',w:{1:['1+2','TEST'],2:['1+1','TEST'],3:['1+2','TEST'],4:['1+1','TEST']}},
+      {c:'B',name:'Pull-Up / Chin-Up',note:'Set 1 AMRAP; following sets get ½ total using weight.',tempo:'2010',rest:'As needed',w:{1:['1+2','AMRAP + ½ total'],2:['1+3','AMRAP + ½ total'],3:['1+3','AMRAP + ½ total'],4:['1+3','AMRAP + ½ total']}},
+      {c:'C',name:'Row (choice)',note:'DB · cable · inverted · machine.',tempo:'2010',rest:'<2 min',restSec:100,w:{1:['3–5','8–12'],2:['4–6','8–12'],3:['4–6','8–12'],4:['4–6','8–12']}}],
+    circuit:{title:'Finisher',items:['Biceps — 12','Push-up or shoulder complex — AMRAP','Band pull-aparts — 20+']},
+    outro:'Optional long row / run / bike — 15–20 min.'},
+  aerobic:{name:'Aerobic Capacity',dow:'Wed',session:'Regen',focus:'Steady State',kind:'cardio',
+    desc:'Posture + hip mobility + core. 30–60 min steady low-HR (120–140 bpm). Foam roll + stretch.',timer:{work:1800,rest:0,rounds:1,label:'30-min steady'},logf:['Time (min)','Avg HR']},
+  tempo:{name:'Tempo / Fartlek',dow:'Sat',session:'Regen · Aerobic · Core',focus:'Long Tempo',kind:'cardio',
+    desc:'Core/stability series. MB circuit + throws + crawling (1–3 rounds). Long tempo/fartlek: 200 yd, walk 100 — start 4 reps, build to 6–8. Foam roll + stretch.',logf:['Reps','Notes']},
+ }};
+
+/* ---------- P4 ---------- */
+const P4={
+ sched:[['Mon','lift1',['Top-End Speed','Upper Lift']],['Tue','lift2',['COD','Lower Lift']],
+  ['Wed','run800',['Repeat 800m']],['Thu','lift3',['Upper Lift','Lactic Power Row']],
+  ['Fri','lift4',['Run','Lower Lift']],['Sat','funguns',['Fun & Guns','Tempo Row']],['Sun',null,['Off']]],
+ days:{
+  lift1:{name:'Lift 1',dow:'Mon',session:'Upper Body',focus:'Top-End Speed',kind:'lift',
+    prep:[['Session 1 — Top-End Acceleration (sub-max · high volume)'],['General warm-up — linear, dynamic flex'],['Low-amplitude jumps (SL & DL) — pogo, short ground contact'],['Plyo series — skip H/D, bound, straight-leg bound','×2–3'],['Bounds — bent + straight, 25 yd','2–3 ea'],['Long accelerations — 90%, 25–40 yd (2 min rest in-set · 3–5 min b/w sets)',{1:'3–4 total',2:'3–5 total',3:'4–6 total'}],['Pre-lift: OH series, pull-aparts, wall slides, push-up/row'],['Long overhead prep — foam roll, T-spine, OH reach/breathe, PVC']],
+    ex:[{c:'A',name:'Bench Press — w/ chains',note:'Not speed. Smooth. Chains 1–2 per side.',tempo:'2011',rest:'3–5 min',restSec:240,warmup:'95×10 · 135×5 · 185×1',w:{1:['3','5'],2:['4','4'],3:['5','3']}},
+      {c:'B',name:'Bench Accessory',note:'Lose chain, add slingshot.',tempo:'2010',rest:'2–3 min',restSec:150,w:{1:['1–2','AMRAP'],2:['2','AMRAP'],3:['2–3','AMRAP']}},
+      {c:'C',name:'Lat Pulldown Complex',note:'Wide grip — tall pulldown, then lean back into a row.',tempo:'2010',rest:'SL stance series',w:{1:['4–5','8–10 + 5–10'],2:['5–6','8–10 + 5–10'],3:['5–6','8–10 + 5–10']}}],
+    circuit:{title:'Circuit — 2–3 rounds',items:['Inverted row — AMRAP','Skull / tricep variation','DB shoulder complex']}},
+  lift2:{name:'Lift 2',dow:'Tue',session:'Lower Body',focus:'COD',kind:'lift',
+    prep:[['Session 1 — Pro Agility & Decel (near-max · mid-volume)'],['General warm-up — lateral, dynamic flex'],['Deceleration prep — “hold”, “push”, “shift”','As needed'],['Decel technique — shuffle→stop · crossover→stop · crossover→shuffle→stop','2× ea way'],['Pro agility — stance · first 5 · 2nd 10 · light 5+10'],['Pre-lift: squat-to-stand, spider series, OH work']],
+    ex:[{c:'OLY',name:'Olympic — Power Clean',note:'Hang / blocks. 2–3 real sets.',rest:'1–2 min',restSec:90,w:{1:['2–3','1–2'],2:['2–3','1–2'],3:['2–3','1–2']}},
+      {c:'J1',name:'Jump Complex — Heavy + Vert',note:'2 weighted jumps (≤95 lb), rest 30s, 2 vert jumps. Stop if numbers drop.',track:'metric',metric:'Height',w:{1:['3–5','2+2'],2:['4–6','2+2'],3:['4–6','2+2']}},
+      {c:'A',name:'Squat',note:'Gym-aware (MPV) if you have velocity tools.',tempo:'2011',rest:'Full',restSec:240,warmup:'135×10 · 182×5 · 225×1',w:{1:['2','5'],2:['3','5'],3:['3','5']}},
+      {c:'B',name:'Step-Up — med box (bar)',note:'Short pause, drive up. Optional knee drive.',tempo:'2111',rest:'1 min b/w legs',restSec:60,w:{1:['2','6–8 ea'],2:['3','6–8 ea'],3:['3','6–8 ea']}},
+      {c:'C',name:'Nordic Hamstring Curl',tempo:'4010',rest:'2 min',restSec:120,w:{1:['3–4','5–6'],2:['4–5','5–6'],3:['4–5','5–6']}}],
+    outro:'Anterior core + ISO split squat — 2-way rollouts/planks + deep-lunge hold.'},
+  run800:{name:'800m Repeats',dow:'Wed',session:'Off-Day Run',focus:'Moderate Pace',kind:'cond',
+    cond:{title:'800 m Repeats (mod pace)',desc:'Run 800 m moderate. Rest the length of that 800. Repeat.',fields:RUNF,
+      wk:{1:[S('',[R('800 M','= run time'),R('800 M','= run time')])],2:[S('',[R('800 M','= run time'),R('800 M','= run time'),R('800 M','= run time',true)])],3:[S('',[R('800 M','= run time'),R('800 M','= run time'),R('800 M','= run time')])]}}},
+  lift3:{name:'Lift 3',dow:'Thu',session:'Upper Body 2',focus:'Test Sim + Lactic Row',kind:'lift',
+    prep:[['Pre-lift: OH series, pull-aparts, wall slides'],['Long overhead prep']],
+    ex:[{c:'A',name:'Bench Press — drop-set test sim',note:'195/145 (25s on bar). To near-failure, strip a 25, continue. Phase it.',tempo:'2010',rest:'4–5 min',restSec:270,w:{1:['2','TEST (no fail)'],2:['3','TEST (no fail)'],3:['3','TEST (fail 1st)']}},
+      {c:'B',name:'Chin-Up / Pull-Up — test style',note:'Set 1 strict; next 1–2 sets cheat like the comp.',rest:'Long',w:{1:['2','TEST/CHEAT'],2:['2–3','TEST/CHEAT'],3:['2–3','TEST/CHEAT']}},
+      {c:'C',name:'DB Row — chest supported / 1-arm / cable',tempo:'3010',rest:'2–3 min',restSec:150,w:{1:['4–5','8–10'],2:['5–6','8–10'],3:['5–6','8–10']}}],
+    circuit:{title:'Circuit — 2–3 rounds',items:['ISO-dyn push-up — AMRAP','Face pulls (straps) — AMRAP','Fat-grip curls — 8–12']},
+    cond:{title:'Lactic Power Intervals (Rower)',desc:'Elevate HR to max. Rest until HR back to 110–130 bpm (~1–3 min).',fields:HRF,
+      wk:{1:[S('Series 1',[R('30 sec','to 110–130'),R('30 sec','to 110–130'),R('30 sec','8–10 min')]),S('Series 2',[R('30 sec','to 110–130'),R('30 sec','to 110–130'),R('30 sec','done')])],
+        2:[S('Series 1',[R('35 sec','to 110–130'),R('35 sec','to 110–130'),R('35 sec','8–10 min')]),S('Series 2',[R('30 sec','to 110–130'),R('30 sec','to 110–130'),R('30 sec','done')])],
+        3:[S('Series 1',[R('35 sec','to 110–130'),R('35 sec','to 110–130'),R('35 sec','8–10 min')]),S('Series 2',[R('35 sec','to 110–130'),R('35 sec','to 110–130'),R('35 sec','done')])]}}},
+  lift4:{name:'Lift 4',dow:'Fri',session:'Lower Body',focus:'COD + Broad Jump',kind:'lift',
+    prep:[['Session 1 — COD / Accel / 400 m (choice)'],['General warm-up — lateral, dynamic flex'],['Option 1 — short sprints','6–10 × 10–20 m'],['Option 2 — COD: cone drills / shuttle work'],['Option 3 — 400 m run','total 2–4'],['Broad jump (in lift) — 90%, broken',{1:'2 × 3–4',2:'2 × 4–5',3:'2 × 5–6'}],['Pre-lift: SL stance KB pass, 3-way SL RDL, mini-band hip complex, anterior core']],
+    ex:[{c:'J1a',name:'Broad Jump',note:'Band to decelerate landing. Broken: rest 20–30s b/w reps.',track:'metric',metric:'Distance',w:{1:['2','3–4'],2:['2','4'],3:['2','4']}},
+      {c:'J2a',name:'Counter-Movement Jump',note:'Basically a vertical jump. Sink and go, with arm action.',track:'metric',metric:'Height',tempo:'X0X1',rest:'1–2 min',restSec:90,w:{1:['2–3','1,1,1'],2:['3–4','1,1,1'],3:['3–4','1,1,1']}},
+      {c:'A',name:'Glute Extension — weighted',note:'45° hyper. Good squeeze at top. Alt: hip thrust / GHR / SL hip thrust.',tempo:'2011',rest:'2–3 min',restSec:150,w:{1:['4–5','8–10'],2:['5–6','8–10'],3:['5–6','8–10']}},
+      {c:'B',name:'Bulgarian — Hatfield / hand-assisted',note:'Hands help add weight. Rest 60–90s b/w legs.',tempo:'2020',rest:'60–90s b/w legs',restSec:75,w:{1:['3–4 ea','6–8'],2:['4–5 ea','6–8'],3:['4–5 ea','6–8']}}],
+    outro:'Finish with core, posture and/or static stretch + simple mobility.'},
+  funguns:{name:'Fun & Guns + Tempo Row',dow:'Sat',session:'Regen',focus:'Recovery',kind:'cardio',
+    desc:'Light arms/pump work + tempo rowing. Keep it easy — recovery, not a session.',logf:['Time (min)','Notes']},
+ }};
+
+/* ---------- P5 ---------- */
+const P5={
+ sched:[['Mon','lift1',['Top-End Speed','Upper Lift']],['Tue','offrun',['Row/Run','Football Throw']],
+  ['Wed','lift2',['COD','Lower Lift']],['Thu','offrow',['Run/Row','Lactic Capacity']],
+  ['Fri','lift3',['Accels','Upper Lift']],['Sat','funguns',['Regen','Fun & Guns']],['Sun',null,['Off']]],
+ days:{
+  lift1:{name:'Lift 1',dow:'Mon',session:'Upper Body',focus:'Top-End · Vert in Lift',kind:'lift',
+    prep:[['Session 1 — Linear Acceleration, Top-End (vert in lift)'],['General warm-up — linear'],['Plyo series — skip H/D, bound, straight-leg bound','1 of ea × field'],['Speed skill — add claw, heel recovery + arms'],['Option 1 — wickets + maintain','2 wickets · 2–4 w/ & w/o'],['Option 2 — build-ups + hollows','2–3 each'],['Option 3 — flying 10’s','20 + 10'],['Start work'],['Sprint complex — resisted (25/30 yd) + free','2–3 × (1+1)'],['Pre-lift: OH series, pull-aparts, wall slides'],['Long overhead prep']],
+    ex:[{c:'A',name:'Bench Press',note:'Pause on first rep only — NO fail. Sub floor/Swiss if needed.',tempo:'2011',rest:'3–5 min',restSec:240,warmup:'95×10 · 135×5 · 185×1',w:{1:['Build','3'],2:['Build','2'],3:['Build','1']}},
+      {c:'B',name:'Bench Accessory',note:'Slingshot or pick something.',rest:'2–3 min',restSec:150,w:{1:['1–2','—'],2:['1–3','—'],3:['1–3','—']}},
+      {c:'C1',name:'Power Cluster',note:'Power clean (hang/blocks) · loaded jump · kBox squat. 20s b/w reps, then to jump.',tempo:'10X1',rest:'to jump',xc:'5+5',w:{1:['3','1+1+1'],2:['4','1+1+1'],3:['4','1+1+1']}},
+      {c:'C2',name:'Vertical Jump (vertec)',note:'Record absolute height; last set record best vert.',track:'metric',metric:'Height (cm)',w:{1:['ALL','—']}}],
+    circuit:{title:'Circuit — 2–3 rounds',items:['Inverted row — AMRAP','Press-downs — 10+','Alt DB lat raise — 8–10 ea','Fat-grip curl — 10+']}},
+  offrun:{name:'Distance Repeats',dow:'Tue',session:'Off-Day Run',focus:'Fast 800 / Mod 400',kind:'cond',
+    cond:{title:'Distance Repeats — Fast 800 / Mod 400',desc:'Run 800 fast. Rest 2× the time. Run 400 moderate. (w/ football throw.)',fields:RUNF,
+      wk:{1:[S('',[R('800 M','2× time'),R('400 M','2× time'),R('400 M','2× time',true)])],2:[S('',[R('800 M','2× time'),R('400 M','2× time'),R('400 M','2× time')])],
+        3:[S('',[R('800 M','2× time'),R('800 M — mod','2× time'),R('400 M — mod','2× time'),R('400 M — mod','2× time',true)])]}}},
+  lift2:{name:'Lift 2',dow:'Wed',session:'Lower Body',focus:'COD · Speed + Jumps',kind:'lift',
+    prep:[['Session 1 — Pro Agility, L & Decel (near-max · mid-volume)'],['General warm-up — lateral'],['Deceleration prep','As needed'],['Decel technique — shuffle / crossover to stop','2× ea way'],['Pro agility & L — drill breakdown'],['Pre-lift: squat-to-stand, spider series, OH work']],
+    ex:[{c:'A1',name:'Speed Lower — Squat w/ Chains',note:'55–65% bar + ~25% chain. Alt: trap-bar DL w/ chain · belt/kBox squat.',tempo:'1011',rest:'Short',restSec:60,warmup:'132×10 · 182×5 · 182+1 · 182+2',w:{1:['4','3'],2:['6','3'],3:['6','3']}},
+      {c:'A2',name:'Weighted / Depth Jumps',note:'Weighted (2 DB, <85 total) or depth jump off 12–18″ box. Force plate if available.',track:'metric',metric:'Height',w:{1:['ALL','1+1+1']}},
+      {c:'B',name:'Reactive Jumps (dowel)',note:'Moderate contact time. Contact grid / plates.',tempo:'X0X0',rest:'2–3 min',restSec:150,w:{1:['2–3','4–5'],2:['3–4','4–5'],3:['3–5','4–5']}},
+      {c:'C',name:'Glute/Ham Complex',note:'First 2–3 sets glute-ext (zercher band, 45° hyper); next 2–3 nordic/GHR.',tempo:'1011* + 5000',rest:'2 min',restSec:120,xc:'+5',w:{1:['2+2','6–8'],2:['3+2','6–8'],3:['3+3','6–8']}}],
+    outro:'Movement series: SL stance KB pass, 3-way SL RDL, mini-band hip complex, anterior core, ISO split squat.'},
+  offrow:{name:'Lactic Capacity Intervals',dow:'Thu',session:'Off-Day Row',focus:'Rower',kind:'cond',
+    cond:{title:'Lactic Capacity Intervals (Rower)',desc:'Push max sustainable effort for the given time. Work climbs each week.',fields:HRF,
+      wk:{1:[S('Series 1',[R('90 sec','90 sec'),R('90 sec','90 sec'),R('90 sec','4 min')]),S('Series 2',[R('90 sec','120 sec'),R('90 sec','120 sec'),R('90 sec','120 sec')],true)],
+        2:[S('Series 1',[R('105 sec','90 sec'),R('105 sec','90 sec'),R('105 sec','4 min')]),S('Series 2',[R('90 sec','105 sec'),R('90 sec','105 sec'),R('90 sec','105 sec')])],
+        3:[S('Series 1',[R('105 sec','75 sec'),R('105 sec','75 sec'),R('105 sec','4 min')]),S('Series 2',[R('105 sec','90 sec'),R('105 sec','90 sec'),R('105 sec','90 sec')])]}}},
+  lift3:{name:'Lift 3',dow:'Fri',session:'Upper Body',focus:'No Field Work',kind:'lift',
+    prep:[['Session 1 — Linear Accel + COD (max · low volume · vert in lift)'],['General warm-up — linear'],['Low-amplitude jumps (SL & DL) — pogo'],['Broad jump',{1:'3–4',2:'4–5',3:'4–5'}],['Speed skill · start work'],['Short accels — w/ start technique'],['Resisted turn-over (partner band) — 20 yd · rest 3–4 min',{1:'4–5',2:'5–6',3:'5–8'}],['If time — pro agility & L'],['Pre-lift: upper-back/T-spine tissue, triceps/teres, pull-aparts, push-up w/ sink-through']],
+    ex:[{c:'A',name:'Bench Press',note:'First set regular, second slingshot. ~235 or 195.',tempo:'2010',rest:'5+ min',restSec:300,warmup:'combine warm-up',w:{1:['1+1','TEST (no fail)'],2:['1+1','TEST (no fail)'],3:['Maybe','TEST (fail 1st)']}},
+      {c:'B',name:'Pull-Up + Chin-Up',note:'First 2 sets pull-ups, then chins.',tempo:'2010 / 3010',rest:'2–3 min',restSec:150,xc:'12–15',w:{1:['2+2','AMRAP'],2:['2+3','AMRAP'],3:['2+3','AMRAP']}},
+      {c:'C',name:'Cable Low Row — seated',note:'Swiss bar if possible. Torso vertical, no shrug.',tempo:'3010',rest:'2 min',restSec:120,w:{1:['3–4','8–12'],2:['4–5','8–12'],3:['4–5','8–12']}},
+      {c:'D1',name:'Push-Up',note:'ISO-dyn. Pair with lower mobility.',rest:'2–4 min',restSec:180,w:{1:['2–4','AMRAP'],2:['3–5','AMRAP'],3:['3–5','AMRAP']}}],
+    outro:'Light upper-body band + mobility work.'},
+  funguns:{name:'Regen + Fun & Guns',dow:'Sat',session:'Regen',focus:'Recovery',kind:'cardio',
+    desc:'Easy regeneration + light arms/pump. Keep it low intensity.',logf:['Time (min)','Notes']},
+ }};
+
+/* ---------- P6 ---------- */
+const P6={
+ sched:[['Mon','lift1',['COD + Jumps (Force)','Lower Lift']],['Tue','lift2',['Upper Lift','Football / ESD']],
+  ['Wed','aerobic',['Aerobic / Regen']],['Thu','lift3',['Long Accels + Jumps','Lower Lift']],
+  ['Fri','lift4',['Upper Lift']],['Sat','rowtempo',['Extensive Tempo Row']],['Sun',null,['Off']]],
+ days:{
+  lift1:{name:'Lift 1 (Hi)',dow:'Mon',session:'Lower Body',focus:'COD + Jumps (Force)',kind:'lift',
+    prep:[['Day 1 — COD + Jumps (Force)'],['Warm-up A + lateral d-flex'],['Decel skill/prep + shuffle / crossover to stop'],['Multi-direction cone drills / shuttles'],['Change of direction — race / chase / multi-sprint'],['Jumps — at lift (see A2 · A3)'],['Pre-lift: squat-to-stand, spider series, OH work']],
+    ex:[{c:'TEST',name:'CMJ Jump Test (prior to lift)',note:'2–3 reps before lifting. Log height.',track:'metric',metric:'Height (cm)',w:{1:['2–3','—']}},
+      {c:'A1',name:'Complex — Squat',note:'Back/safety/kBox · trap-bar · partial · Hatfield. Velocity-based, avg > .60 m/s.',tempo:'2011',rest:'Short',restSec:60,warmup:'132×10 · 182×5 · 222×1 · 272×1',w:{1:['4','3'],2:['4','3'],3:['4','3']}},
+      {c:'A2',name:'Complex — DB Loaded Jump',note:'10–20% bw, CMJ rebound — jump twice, no pause. Record worst & best.',track:'metric',metric:'Height',tempo:'X0X0',w:{1:['4','2 (2)'],2:['4','2 (2)'],3:['4','2 (2)']}},
+      {c:'A3',name:'Complex — Vertical Jump (approach)',note:'Touch vertec. Record best & last per week.',track:'metric',metric:'Height (cm)',tempo:'X0X1',rest:'2–3 min',restSec:150,w:{1:['ALL','1+1+1']}},
+      {c:'B',name:'Post Chain — Nordic Ham Raise',note:'Lower & raise with least push possible.',tempo:'4011 / 4000',rest:'2 min',restSec:120,w:{1:['3–4','5–6'],2:['4–5','5–6'],3:['4–5','5–6']}}],
+    outro:'Core: deadbug, roll-outs, tall-kneel X-chop, tall-kneel anti-rotation press-out.'},
+  lift2:{name:'Lift 2 (Med)',dow:'Tue',session:'Upper Body',focus:'Football + ESD',kind:'lift',
+    prep:[['Day 2 — Football + ESD (after lift)'],['Warm-up A + linear d-flex + SL stability + box warm-up'],['Mirror + wave drills + bag / cone drills','pro agility if partner'],['Football throws — nothing crazy'],['800 m repeats — see conditioning below'],['Pre-lift: OH series, pull-aparts, wall slides']],
+    ex:[{c:'A',name:'Bench Press',note:'Smooth lowering; good arch + scap squeeze.',tempo:'2011',rest:'3–4 min',restSec:210,warmup:'45×10 · 95×10 · 135×5 · 185×1',w:{1:['2','4'],2:['3','3'],3:['4','2']}},
+      {c:'B',name:'DB Incline Bench — alternating',note:'Top position. Record both sets (wt × rep).',tempo:'2011',rest:'<2 min',restSec:100,w:{1:['2','8–10 ea'],2:['2','8–10 ea'],3:['2','8–10 ea']}},
+      {c:'C',name:'Inverted Row — fat grip (Swiss)',note:'Knees bent, chest directly under the bar.',tempo:'2010',rest:'2–3 min',restSec:150,w:{1:['4–5','AMRAP'],2:['5–6','AMRAP'],3:['5–6','AMRAP']}}],
+    circuit:{title:'Circuit — 2–3 rounds',items:['DB row — chest supported 8–12','Hi-to-low cable complex — biceps 8–12 + face pull 8–12 + press-down 8–12']},
+    cond:{title:'800 m Repeats (fast)',desc:'Football throw + ESD after lift. Run 800 mod/fast. Rest 2× the time.',fields:RUNF,
+      wk:{1:[S('',[R('800 M','2× time'),R('800 M','2× time'),R('800 M','2× time',true)])],2:[S('',[R('800 M','2× time'),R('800 M','2× time'),R('800 M','2× time')])],3:[S('',[R('800 M','2× time'),R('800 M','2× time'),R('800 M','2× time'),R('800 M','2× time',true)])]}}},
+  lift3:{name:'Lift 3 (MedHi)',dow:'Thu',session:'Lower Body',focus:'Long Accels + Jumps',kind:'lift',
+    prep:[['Day 4 — Long-Accel'],['Warm-up A + linear + extra hip mobility'],['Wall series — “lift” & “punch”'],['Start work — heavy resisted bounding (low foot) + high hurdle (reactive), sled/chains'],['High-hurdle reactive — after heavy bound, 5–6 continuous hurdle jumps'],['RSA sprints — resisted / uphill, 20–30 yd',{1:'2 × 4–6',2:'2 × 6–8',3:'2 × 6–9'}],['Pre-lift: squat-to-stand, spider series, OH work']],
+    ex:[{c:'A1',name:'Single-Leg of Choice',note:'SL squat (box) up to 10ea · Bulgarian 12–15 · rev lunge 12–15 · heavy step-up 12ea.',tempo:'2011',rest:'1–1.5 min b/w legs',restSec:75,w:{1:['3–4 ea','by choice'],2:['4–5 ea','by choice'],3:['4–5 ea','by choice']}},
+      {c:'A2',name:'Power Clean Complex',note:'PC high-hang ×1 + PC hang (slow ecc) ×1 + PC hang ×1.',rest:'2 min',restSec:120,w:{1:['2','1+1+1'],2:['3','1+1+1'],3:['3','1+1+1']}},
+      {c:'B1',name:'Glute / Hammy Series',note:'Sets 1–2 glute-ext (45°) · 3–4 SL hammy march (band) · 5–6 ISO hammy 20–30s.',tempo:'2010 / 2121 / ISO',rest:'1–2 min',restSec:90,w:{1:['—','15–20, 10 ea, ISO'],2:['2+2+2','15–20, 10 ea, ISO'],3:['—','15–20, 10 ea, ISO']}}],
+    circuit:{title:'Core circuit — 2–4 rounds',items:['Bodysaw (slideboard) — up to 10','Fast deadbug — 10+ ea','Fast band rotation — 10 ea']}},
+  lift4:{name:'Lift 4 (Med/Low)',dow:'Fri',session:'Upper Body',focus:'Test / Volume',kind:'lift',
+    prep:[['Pre-lift: OH series, pull-aparts, wall slides']],
+    ex:[{c:'A',name:'Bench Press',note:'First regular, second slingshot. 185 → 165 → 135.',tempo:'2010',rest:'5+ min',restSec:300,warmup:'combine warm-up',w:{1:['3','TEST (no fail)'],2:['3','TEST (no fail)'],3:['3','TEST (fail 1st)']}},
+      {c:'B',name:'Pull-Up + Chin-Up',note:'First 2 sets pull-ups, then chins (slow tempo).',tempo:'2010 / 3010',rest:'2–3 min',restSec:150,w:{1:['2+2','AMRAP, AMRAP'],2:['2+3','AMRAP, AMRAP'],3:['2+3','AMRAP, AMRAP']}},
+      {c:'C',name:'Row of Choice',note:'Cable low row · DB row · bent-over (Swiss — careful).',tempo:'2010',rest:'<2 min',restSec:100,w:{1:['4','8–12'],2:['5','8–12'],3:['5','8–12']}}],
+    circuit:{title:'Circuit — 2–3 rounds',items:['Push-up (choice) — AMRAP','Prone Y-to-Ws — 20','Grip / neck / farmers / shrug']},
+    outro:'Saturday: extensive tempo rowing + corrective.'},
+  aerobic:{name:'Aerobic / Regen',dow:'Wed',session:'Recovery',focus:'Aerobic Circuit',kind:'cardio',
+    desc:'Aerobic circuit 30–45 min. Row, abs, super-light bodyweight strength, mobility/yoga. Keep moving at a moderate/low pace. Posture + static + tissue.',timer:{work:1800,rest:0,rounds:1,label:'30-min circuit'},logf:['Time (min)','Avg HR']},
+  rowtempo:{name:'Extensive Tempo Row',dow:'Sat',session:'Off-Day Row',focus:'500 m Reps',kind:'cond',
+    cond:{title:'Extensive Tempo (Rower)',desc:'Push moderate effort for the given distance.',fields:['Time','Max HR','Avg HR','HR after rest'],
+      wk:{1:[S('Series 1',[R('500 m','120 sec'),R('500 m','120 sec'),R('500 m','4 min')]),S('Series 2',[R('500 m','120 sec'),R('500 m','120 sec'),R('500 m','120 sec')],true)],
+        2:[S('Series 1',[R('500 m','90 sec'),R('500 m','90 sec'),R('500 m','4 min')]),S('Series 2',[R('500 m','120 sec'),R('500 m','120 sec'),R('500 m','120 sec')])],
+        3:[S('Series 1',[R('750 m','120 sec'),R('750 m','120 sec'),R('750 m','4 min')]),S('Series 2',[R('500 m','120 sec'),R('500 m','120 sec'),R('500 m','120 sec')])]}}},
+ }};
+
+/* ---------- P7 ---------- */
+const P7={
+ sched:[['Mon','fieldpower',['Field Events (Power)']],['Tue','lift1',['Lift Only','Upper']],
+  ['Wed','regen',['Aerobic / Regen','500 m Row']],['Thu','endur1',['Endurance Events']],
+  ['Fri','lift2',['Field Events (Short)','Total Lift']],['Sat','endur2',['Endurance Events','Row']],['Sun',null,['Off']]],
+ days:{
+  fieldpower:{name:'Field Events — Power',dow:'Mon',session:'Speed / Power',focus:'Field Only',kind:'field',
+    prep:[['Day 1 — Field Events (Power)'],['Warm-up A + linear + extra hip mobility'],['Vert (at facility)','2 × 3'],['Wall series — “lift” & “punch”'],
+      ['Start work','2–3 × 10–15 yd (90–95%)'],['Top-end work','3 × long build-ups (80/85/90%)'],
+      ['40 yd dash',{1:'2×40 (90%)',2:'2×40 (90–95%)',3:'2×40 (90–95%)'}],['Broad (football throw b/w sets)','2 × 3'],
+      ['Pro-agility (5-10-5)',{1:'2–3 ea',2:'2–4 ea',3:'2–4 ea'}]],
+    desc:'Field-only power day — no lift. Log key numbers below.',logf:['40 yd','Broad','Notes']},
+  lift1:{name:'Lift 1',dow:'Tue',session:'Upper Body',focus:'Lift Only',kind:'lift',
+    prep:[['Pre-lift: OH series, pull-aparts, wall slides']],
+    ex:[{c:'A',name:'Bench Press — rest-pause + slingshot',note:'Set 1: AMRAP, rack 20s, AMRAP again. Set 2: same w/ slingshot.',tempo:'2010',rest:'5+ min',restSec:300,warmup:'combine warm-up',w:{1:['1+1','TEST (AMRAP ×2)'],2:['1+1','TEST (AMRAP ×2)'],3:['1+1','TEST (AMRAP ×2)']}},
+      {c:'B',name:'Chin-Up — weighted',note:'25–50 lb external. Pause at the bottom.',tempo:'3110',rest:'2–4 min',restSec:180,w:{1:['2–3','AMRAP'],2:['3–4','AMRAP'],3:['3–4','AMRAP']}},
+      {c:'C',name:'Power Clean (hang) — EMOM',note:'Every minute on the minute. Moderate weight, high effort.',tempo:'10X1',rest:'<1 min',restSec:55,w:{1:['8–10','1–2'],2:['10–12','1–2'],3:['10–12','1–2']}}],
+    circuit:{title:'Finisher — 2–3 rounds',items:['Nordic hamstring curl','Row — high rep (strict)','Triceps — light, smooth, high rep','Core — static (deadbug)']}},
+  regen:{name:'Aerobic / Regen',dow:'Wed',session:'Recovery',focus:'500 m Row + Density',kind:'cardio',
+    desc:'500 m row — 1 rep timed. Aerobic density: 1 min on / 1 min off × 10 min. Aerobic capacity: 20–30 min low intensity (bike/row/jog/swim/mobility). Posture + static + tissue.',timer:{work:60,rest:60,rounds:10,label:'1 min on / 1 min off × 10'},logf:['500 m time','Avg HR']},
+  endur1:{name:'Endurance Events',dow:'Thu',session:'Field Endurance',focus:'800 + 400',kind:'cond',
+    prep:[['Day 4 — Endurance Events'],['Warm-up A + linear + extra hip mobility'],['Long build-ups','2 × 100 m (60–70%, 70–80%)'],['If you feel decent — tempo runs','stride 70% 100 m · walk 100 m × 2–4']],
+    cond:{title:'Distance Repeats — Fast 800 + Fast 400',desc:'Run 800 fast. Rest 6–10 min. Run 400 fast. (Wk2–3: optional tempo runs — 100m stride 70% / 100m walk × 2–4.)',fields:['Time','Max HR','Avg HR','HR after 2-min rest'],
+      wk:{1:[S('',[R('800 M','6–10 min'),R('400 M','')])],2:[S('',[R('800 M','6–10 min'),R('400 M','')])],3:[S('',[R('800 M','6–10 min'),R('400 M','')])]}}},
+  lift2:{name:'Lift 2',dow:'Fri',session:'Lower / Complex',focus:'Short Field + Total Lift',kind:'lift',
+    prep:[['Day 5 — Field Events Day 2 (Power), half'],['Warm-up A + linear + extra hip mobility'],['Wall series — “lift” & “punch”'],['Start work — practice stance & start','2–3 × 10–15 yd (90–95%)'],['15–20 yd dash',{1:'2 × 15–20 (90%)',2:'2 × 15–20 (90–95%)',3:'2 × 15–20 (90–95%)'}],['Broad (football throw b/w sets)','2 × 2'],['Decel skill/prep + pro agility prep'],['Pro-agility (5-10-5)','1–2 ea way'],['Pre-lift: squat-to-stand, spider series, OH work'],['CMJ jump test prior (2–3 reps)']],
+    ex:[{c:'A1',name:'Complex — Squat (speed)',note:'Record worst & best jump per week (paired jump).',tempo:'1010',rest:'Short',restSec:60,w:{1:['4–5','3'],2:['5–6','3'],3:['6–8','3']}},
+      {c:'A2',name:'Complex — Weighted CMJ',note:'Bar on back ≤20% squat 1RM. Record best & last.',track:'metric',metric:'Height (cm)',tempo:'X0X1',rest:'2–3 min',restSec:150,w:{1:['ALL','1+1+1']}},
+      {c:'B',name:'Bench Press — strict, pause',note:'Don’t fail — get reps but push a little. Good warm-up (bench is hard after squats).',tempo:'2111',rest:'3–4 min',restSec:210,warmup:'45×10 · 95×10 · 135×5 · 185×1',w:{1:['2','3'],2:['3','2'],3:['4','1']}},
+      {c:'C',name:'Pull-Up Test — tempo drop set',note:'5 slow eccentric (no kip), then AMRAP w/ test mechanics.',tempo:'3010 / 1010',rest:'2–4 min',restSec:180,w:{1:['3–4','AMRAP'],2:['3–4','AMRAP'],3:['3–4','AMRAP']}}],
+    circuit:{title:'Finisher — 2–3 rounds',items:['Push-up (any)','Face pull / row (any)','ISO split squat — 30s ea leg','Core — rotary (chops, twists, press-outs)']}},
+  endur2:{name:'Endurance Events + Row',dow:'Sat',session:'Field Endurance',focus:'Lactic Run + Row',kind:'cond',
+    cond:{title:'Lactic Capacity Intervals (Run)',desc:'Run max sustainable effort for the time. Then all weeks: extensive rower 8–20 min.',fields:HRF,
+      wk:{1:[S('Series 1',[R('60 sec','90 sec'),R('60 sec','90 sec'),R('60 sec','4 min')]),S('Series 2',[R('60 sec','120 sec'),R('60 sec','120 sec'),R('60 sec','120 sec')],true),S('Extensive Row',[R('8–20 min','')])],
+        2:[S('Series 1',[R('75 sec','90 sec'),R('75 sec','90 sec'),R('75 sec','4 min')]),S('Series 2',[R('60 sec','105 sec'),R('60 sec','105 sec'),R('60 sec','105 sec')]),S('Extensive Row',[R('8–20 min','')])],
+        3:[S('Series 1',[R('75 sec','90 sec'),R('75 sec','90 sec'),R('75 sec','4 min')]),S('Series 2',[R('75 sec','105 sec'),R('75 sec','105 sec'),R('75 sec','105 sec')]),S('Extensive Row',[R('8–20 min','')])]}}},
+ }};
+
+const DATA={P1,P2,P3,P4,P5,P6,P7};
+
+/* ===================== STORAGE (guarded) ===================== */
+const Store=(()=>{let ok=false,mem={};try{const k='__d10t';localStorage.setItem(k,'1');localStorage.removeItem(k);ok=true;}catch(e){}
+  return{ok,get(k,d){try{if(ok){const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}}catch(e){}return (k in mem)?mem[k]:d;},
+    set(k,v){try{if(ok){localStorage.setItem(k,JSON.stringify(v));return;}}catch(e){}mem[k]=v;}};})();
+let LOGS=Store.get('d10.logs.v2',{});
+let POS=Store.get('d10.pos.v2',{pid:'P1',week:1,day:'lift1'});
+let TAB='program';
+const saveLogs=()=>Store.set('d10.logs.v2',LOGS);
+const savePos=()=>Store.set('d10.pos.v2',POS);
+function cell(pid,wk,day){LOGS[pid]=LOGS[pid]||{};LOGS[pid][wk]=LOGS[pid][wk]||{};
+  LOGS[pid][wk][day]=LOGS[pid][wk][day]||{ex:{},cond:{},cardio:{},circuit:{}};return LOGS[pid][wk][day];}
+function peek(pid,wk,day){return (((LOGS[pid]||{})[wk]||{})[day])||null;}
+
+/* ===================== helpers ===================== */
+const $=(s,el=document)=>el.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function setAcc(hex){document.documentElement.style.setProperty('--acc',hex);document.querySelector('meta[name=theme-color]').setAttribute('content',hex);}
+const P=id=>PERIODS.find(p=>p.id===id);
+function wkOf(x,wk){const a=x.w[wk]||x.w[Math.max.apply(0,Object.keys(x.w).map(Number))];return{sets:a[0],reps:a[1]};}
+function nRows(x,wk,saved){if(x.track==='metric')return Math.max(3,(saved&&saved.length)||0);
+  const g=parseInt(String(wkOf(x,wk).sets).match(/\d+/)?.[0]||'3',10);return Math.max(g,(saved&&saved.length)||0,1);}
+function workSecs(w){if(!w)return null;let m=String(w).match(/([\d.]+)\s*min/i);if(m)return Math.round(parseFloat(m[1])*60);
+  m=String(w).match(/([\d.]+)\s*sec/i);if(m)return Math.round(parseFloat(m[1]));return null;}
+function dayComp(pid,wk,day){const D=DATA[pid]&&DATA[pid].days[day];if(!D||!D.ex)return null;
+  const c=peek(pid,wk,day);const lifts=D.ex.filter(x=>x.track!=='metric');if(!lifts.length)return null;
+  if(!c)return{done:0,total:lifts.length};let d=0;lifts.forEach(x=>{const s=c.ex[x.c]||[];if(s.some(v=>v&&v.done))d++;});return{done:d,total:lifts.length};}
+
+function renderCtx(){const p=P(POS.pid);const D=DATA[p.id]?DATA[p.id].days[POS.day]:null;
+  $('#ctx').innerHTML=`<span class="dot"></span>${esc(p.id)} · WK ${POS.week} · ${esc(D?D.name:'—')}`;}
+
+/* ===================== views ===================== */
+function render(){renderCtx();document.querySelectorAll('.navbtn').forEach(b=>b.dataset.on=(b.dataset.nav===TAB)?'1':'0');
+  if(TAB==='program')return viewProgram();if(TAB==='info')return viewInfo();return viewDay(POS.pid,POS.week,POS.day);}
+
+function viewProgram(){setAcc(P(POS.pid).accent);
+  const bars=()=>{let s='';for(let i=0;i<7;i++){s+=`<i style="height:${16+62*(i/6)}%"></i>`;}return s;};
+  $('#view').innerHTML=`
+    <div class="eyebrow" style="margin-top:20px">D-10 2019 Prep · Jeff Branham</div>
+    <h1>The Program</h1>
+    <div class="sub">Seven periods, cool to hot — accumulation through peak. Tap a period to train it.</div>
+    <div class="spine">${PERIODS.map(p=>`
+      <div class="per" style="--pc:${p.accent}" data-current="${p.id===POS.pid?1:0}" onclick="openPeriod('${p.id}')">
+        ${p.id===POS.pid?`<span class="tagcur">Current</span>`:''}
+        <div class="rail"></div><div class="bars">${bars()}</div>
+        <div class="meta"><div class="pphase">${esc(p.id)} · ${esc(p.phase)}</div>
+          <div class="pname">${esc(p.name)}</div><div class="pdates">${esc(p.dates)} · ${p.weeks} weeks</div></div>
+        <div class="pgo">&rsaquo;</div></div>`).join('')}</div>
+    <div class="foot">Full program · P1–P7 live</div>`;}
+
+function openPeriod(pid){POS.pid=pid;if(POS.week>P(pid).weeks)POS.week=1;
+  if(!DATA[pid].days[POS.day])POS.day=DATA[pid].sched.find(s=>s[1])[1];savePos();viewPeriod(pid);}
+
+function viewPeriod(pid){const p=P(pid);setAcc(p.accent);TAB='';document.querySelectorAll('.navbtn').forEach(b=>b.dataset.on='0');renderCtx();
+  const wk=POS.week;
+  $('#view').innerHTML=`
+    <div class="backrow"><button class="back" onclick="go('program')">&lsaquo; Program</button></div>
+    <div class="eyebrow" style="margin-top:8px">${esc(p.id)} · ${esc(p.phase)}</div>
+    <h1>${esc(p.name)}</h1>
+    <div class="sub">${esc(p.dates)} · repeats ${p.weeks} weeks. Prescriptions progress each week.</div>
+    <div class="weeks">${Array.from({length:p.weeks},(_,i)=>i+1).map(w=>`<button class="pip" data-on="${w===wk?1:0}" onclick="setWeek(${w})">WK ${w}</button>`).join('')}</div>
+    <div class="days">${DATA[pid].sched.map(s=>dayRow(pid,wk,s)).join('')}</div>
+    <div class="foot">Tap a session to train &amp; log</div>`;}
+
+function dayRow(pid,wk,s){
+  if(!s[1])return `<div class="day off"><span class="dow">${esc(s[0])}</span><div class="dbody"><div class="dname">Off</div></div></div>`;
+  const D=DATA[pid].days[s[1]];const kc={lift:'kindLift',cond:'kindCond',cardio:'kindCardio',field:'kindField'}[D.kind]||'kindLift';
+  const comp=dayComp(pid,wk,s[1]);let ring='';
+  if(comp&&comp.total){const c=2*Math.PI*10,off=c*(1-comp.done/comp.total);
+    ring=`<div class="dprog"><svg class="ring" width="26" height="26" viewBox="0 0 26 26"><circle class="bg" cx="13" cy="13" r="10" fill="none" stroke-width="3"/><circle class="fg" cx="13" cy="13" r="10" fill="none" stroke-width="3" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/></svg></div>`;}
+  const chip={lift:'Lift',cond:'ESD',cardio:'Cardio',field:'Field'}[D.kind]||'Lift';
+  return `<div class="day ${kc}" onclick="openDay('${pid}',${wk},'${s[1]}')"><div class="kbar"></div>
+    <span class="dow">${esc(s[0])}</span><div class="dbody"><div class="dname">${esc(D.name)}</div>
+    <div class="dtype">${esc(s[2].join(' · '))}</div></div>${ring||`<span class="dchip">${chip}</span>`}</div>`;}
+
+function setWeek(w){POS.week=w;savePos();viewPeriod(POS.pid);}
+function openDay(pid,wk,day){POS.pid=pid;POS.week=wk;POS.day=day;savePos();viewDay(pid,wk,day);}
+
+function viewDay(pid,wk,day){const p=P(pid);setAcc(p.accent);
+  document.querySelectorAll('.navbtn').forEach(b=>b.dataset.on=(b.dataset.nav==='today'&&TAB==='today')?'1':'0');renderCtx();
+  const D=DATA[pid]&&DATA[pid].days[day];const v=$('#view');
+  if(!D){v.innerHTML=`<div class="infobox" style="margin-top:24px">Not built.</div>`;return;}
+  let h=`<div class="backrow"><button class="back" onclick="viewPeriod('${pid}')">&lsaquo; ${esc(p.id)} week</button></div>
+    <div class="dayhead"><div class="focus">${esc(D.focus)}</div><h1>${esc(D.name)}</h1><div class="sub">${esc(D.session)} · Week ${wk}</div></div>
+    <div class="weeks">${Array.from({length:p.weeks},(_,i)=>i+1).map(w=>`<button class="pip" data-on="${w===wk?1:0}" onclick="openDay('${pid}',${w},'${day}')">WK ${w}</button>`).join('')}</div>`;
+  if(D.prep&&D.prep.length){h+=`<details class="prep"><summary>${D.kind==='field'?'Field work':'Warm-up &amp; field work'}<span class="tw">&rsaquo;</span></summary><div class="pbody">${D.prep.map(r=>{
+      let val=(r[1]&&typeof r[1]==='object')?(r[1][wk]||r[1][Object.keys(r[1]).slice(-1)[0]]):(r[1]||'');
+      return `<div class="prow"><div class="pl">${esc(r[0])}</div>${val?`<div class="pv">${esc(val)}</div>`:''}</div>`;}).join('')}</div></details>`;}
+  if(D.kind==='cardio'||D.kind==='field'){h+=cardioCard(pid,wk,day,D);}
+  if(D.cond){h+=condCard(pid,wk,day,D.cond);}
+  if(D.ex)D.ex.forEach(x=>{h+=exCard(pid,wk,day,x);});
+  if(D.circuit)h+=circuitCard(pid,wk,day,D.circuit);
+  if(D.outro)h+=`<div class="note-lite">${esc(D.outro)}</div>`;
+  h+=`<div class="foot">${esc(p.name)} · ${esc(D.name)}</div>`;
+  v.innerHTML=h;}
+
+function exCard(pid,wk,day,x){const rx=wkOf(x,wk);const jump=x.track==='metric';
+  const badge=jump?'jump':(/[0-9]$/.test(x.c)?'alt':'');
+  let h=`<div class="ex"><div class="xh"><div class="badge ${badge}">${esc(x.c)}</div>
+    <div class="xt"><div class="xname">${esc(x.name)}</div>${x.note?`<div class="xnote">${esc(x.note)}</div>`:''}</div></div>
+    <div class="rx"><div class="rxcell"><div class="k">Sets</div><div class="v">${esc(rx.sets)}</div></div>
+      <div class="rxcell big"><div class="k">${jump?'Reps':'Reps'}</div><div class="v">${esc(rx.reps)}</div></div>
+      ${x.tempo?`<div class="rxcell"><div class="k">Tempo</div><div class="v">${esc(x.tempo)}</div></div>`:''}
+      ${x.restSec?`<button class="rest-btn" onclick="Timer.rest(${x.restSec},'${esc(x.name)}')"><span>&#9203;</span> <b>${esc(x.rest||'rest')}</b></button>`:(x.rest?`<div class="rxcell"><div class="k">Rest</div><div class="v" style="font-size:12px">${esc(x.rest)}</div></div>`:'')}
+    </div>`;
+  if(x.warmup)h+=`<div class="rx" style="padding-top:0"><div class="rxcell" style="flex:1"><div class="k">Warm-up</div><div class="v" style="font-size:12.5px">${esc(x.warmup)}</div></div></div>`;
+  if(x.xc)h+=`<div class="xc">&#43; <b>extra credit</b> · ${esc(x.xc)} reps (optional)</div>`;
+  const c=cell(pid,wk,day);const saved=c.ex[x.c]||[];const rows=nRows(x,wk,saved);
+  const prev=peek(pid,wk-1,day);const pset=prev?((prev.ex||{})[x.c]||[]):[];
+  h+=`<div class="sets">`;
+  if(jump){h+=`<div class="setrow metric head"><span class="sh-lbl">Set</span><span>${esc(x.metric||'Result')}</span><span>&#10003;</span></div>`;
+    for(let i=0;i<rows;i++)h+=metricRow(pid,wk,day,x.c,i,saved[i]||{},pset[i]);}
+  else{h+=`<div class="setrow head"><span class="sh-lbl">Set</span><span>Weight</span><span>Reps</span><span>&#10003;</span></div>`;
+    for(let i=0;i<rows;i++)h+=setRow(pid,wk,day,x.c,i,saved[i]||{},pset[i]);}
+  h+=`</div><button class="addset" onclick="addSet('${pid}',${wk},'${day}','${x.c}')">+ add set</button></div>`;
+  return h;}
+
+function setRow(pid,wk,day,code,i,val,prev){const done=val.done?'done':'';
+  const ghost=(prev&&(prev.w||prev.r))?`<div class="lastwk">last wk · <b>${esc(prev.w||'–')}</b> × <b>${esc(prev.r||'–')}</b></div>`:'';
+  return `<div class="setrow ${done}" id="row-${code}-${i}"><div class="setno">${i+1}</div>
+    <input inputmode="decimal" placeholder="lb" value="${esc(val.w||'')}" oninput="upd('${pid}',${wk},'${day}','${code}',${i},'w',this.value)">
+    <input inputmode="numeric" placeholder="reps" value="${esc(val.r||'')}" oninput="upd('${pid}',${wk},'${day}','${code}',${i},'r',this.value)">
+    <button class="chk" onclick="toggleDone('${pid}',${wk},'${day}','${code}',${i})">&#10003;</button>${ghost}</div>`;}
+
+function metricRow(pid,wk,day,code,i,val,prev){const done=val.done?'done':'';
+  const ghost=(prev&&prev.m)?`<div class="lastwk" style="grid-column:2/3">last wk · <b>${esc(prev.m)}</b></div>`:'';
+  return `<div class="setrow metric ${done}" id="row-${code}-${i}"><div class="setno">${i+1}</div>
+    <input inputmode="decimal" placeholder="—" value="${esc(val.m||'')}" oninput="upd('${pid}',${wk},'${day}','${code}',${i},'m',this.value)">
+    <button class="chk" onclick="toggleDone('${pid}',${wk},'${day}','${code}',${i})">&#10003;</button>${ghost}</div>`;}
+
+function upd(pid,wk,day,code,i,f,v){const c=cell(pid,wk,day);c.ex[code]=c.ex[code]||[];c.ex[code][i]=c.ex[code][i]||{};c.ex[code][i][f]=v;saveLogs();}
+function toggleDone(pid,wk,day,code,i){const c=cell(pid,wk,day);c.ex[code]=c.ex[code]||[];c.ex[code][i]=c.ex[code][i]||{};
+  c.ex[code][i].done=!c.ex[code][i].done;saveLogs();const r=$('#row-'+code+'-'+i);if(r)r.classList.toggle('done',c.ex[code][i].done);buzz(8);}
+function addSet(pid,wk,day,code){const c=cell(pid,wk,day);c.ex[code]=c.ex[code]||[];c.ex[code].push({});saveLogs();viewDay(pid,wk,day);}
+
+function condCard(pid,wk,day,C){const series=C.wk[wk]||C.wk[1];
+  let h=`<div class="cond"><div class="ch"><div class="ct">${esc(C.title)}</div><div class="cs">${esc(C.desc)}</div></div>`;
+  if(C.timer)h+=`<button class="interval-btn" onclick="Timer.interval(${C.timer.work},${C.timer.rest},${C.timer.rounds||countReps(series)},'ESD')">&#9654; ${esc(C.timer.label)}</button>`;
+  let idx=0;
+  series.forEach(S0=>{if(S0.name||S0.opt)h+=`<div class="series-h">${esc(S0.name||'Series')}${S0.opt?` <span class="o">· optional</span>`:''}</div>`;
+    S0.reps.forEach(r=>{h+=condRep(pid,wk,day,C,r,idx++);});});
+  h+=`</div>`;return h;}
+function countReps(series){let n=0;series.forEach(s=>n+=s.reps.length);return n;}
+
+function condRep(pid,wk,day,C,r,i){const c=cell(pid,wk,day);const saved=c.cond[i]||{};const ws=workSecs(r.work);
+  return `<div class="reps" style="padding-top:0"><div class="rep">
+    <div class="rhd"><div class="rl">${esc(r.work)}${r.rest?` <small>rest ${esc(r.rest)}</small>`:''}</div>
+      ${r.opt?`<div class="rt">optional</div>`:''}
+      ${ws?`<button class="rtimer" onclick="Timer.work(${ws},'${esc(r.work)}')">&#9654; go</button>`:''}</div>
+    <div class="fields">${C.fields.map(f=>`<div class="fld"><label>${esc(f)}</label><input value="${esc(saved[f]||'')}" oninput="updCond('${pid}',${wk},'${day}',${i},'${esc(f)}',this.value)"></div>`).join('')}</div>
+  </div></div>`;}
+function updCond(pid,wk,day,i,f,v){const c=cell(pid,wk,day);c.cond[i]=c.cond[i]||{};c.cond[i][f]=v;saveLogs();}
+
+function cardioCard(pid,wk,day,D){const c=cell(pid,wk,day);const f=D.logf||['Notes'];
+  let h=`<div class="cond"><div class="ch"><div class="ct">${esc(D.name)}</div><div class="cs">${esc(D.desc||'')}</div></div>`;
+  if(D.timer)h+=`<button class="interval-btn" onclick="Timer.interval(${D.timer.work},${D.timer.rest},${D.timer.rounds||1},'${esc(D.timer.label)}')">&#9654; ${esc(D.timer.label)}</button>`;
+  h+=`<div class="reps"><div class="rep"><div class="rhd"><div class="rl">Log</div></div><div class="fields">
+    ${f.map(lbl=>`<div class="fld"><label>${esc(lbl)}</label><input value="${esc((c.cardio||{})[lbl]||'')}" oninput="updCardio('${pid}',${wk},'${day}','${esc(lbl)}',this.value)"></div>`).join('')}
+  </div></div></div></div>`;return h;}
+function updCardio(pid,wk,day,lbl,v){const c=cell(pid,wk,day);c.cardio=c.cardio||{};c.cardio[lbl]=v;saveLogs();}
+
+function circuitCard(pid,wk,day,C){const c=cell(pid,wk,day);const r=(c.circuit&&c.circuit.rounds)||0;
+  return `<div class="ex"><div class="xh"><div class="badge alt">&#8635;</div><div class="xt"><div class="xname">${esc(C.title)}</div></div></div>
+    <div class="circuit">${C.items.map((it,i)=>`<div class="citem"><span class="cn">${i+1}</span><span>${esc(it)}</span></div>`).join('')}
+    <div class="rounds">Rounds done<div class="stepper"><button onclick="circR('${pid}',${wk},'${day}',-1)">&minus;</button><div class="val" id="circ-${day}">${r}</div><button onclick="circR('${pid}',${wk},'${day}',1)">+</button></div></div></div></div>`;}
+function circR(pid,wk,day,d){const c=cell(pid,wk,day);c.circuit=c.circuit||{rounds:0};c.circuit.rounds=Math.max(0,(c.circuit.rounds||0)+d);saveLogs();
+  const el=$('#circ-'+day);if(el)el.textContent=c.circuit.rounds;buzz(6);}
+
+function viewInfo(){setAcc(P(POS.pid).accent);
+  $('#view').innerHTML=`<div class="eyebrow" style="margin-top:20px">How this works</div><h1>Info</h1>
+    <div class="infobox">
+      <h4>Add to your Home Screen</h4>In Safari, tap <b>Share &rsaquo; Add to Home Screen</b>. Opens full-screen and works offline.
+      <h4>Your log stays on your phone</h4>Everything saves to <b>this device</b> only. Share the same link with friends — each person keeps their own private log, no accounts.
+      <h4>Weekly progression</h4>Prescriptions change each week — use the <b>WK</b> pips. Last week shows as a faint <b>“last wk”</b> line under each set.
+      <h4>Jumps &amp; extra credit</h4>Jump / vertec work logs a single number per set (height or distance). <b>Extra credit</b> reps are optional bonus work, shown in amber.
+      <h4>Timers</h4>Tap the <b>rest</b> pill on any lift, or <b>go</b> on a conditioning rep, for a countdown. Both buzz at zero.
+    </div>
+    <button class="reset" onclick="resetAll()">Erase my saved log on this device</button>
+    <div class="foot">D-10 2019 Prep · P1–P7</div>`;}
+function resetAll(){if(!confirm('Erase all logged sets and progress on this device?'))return;LOGS={};saveLogs();go('program');}
+
+function go(tab){TAB=tab;if(tab==='today'){viewDay(POS.pid,POS.week,POS.day);document.querySelectorAll('.navbtn').forEach(b=>b.dataset.on=(b.dataset.nav==='today')?'1':'0');return;}render();}
+document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>go(b.dataset.nav)));
+
+/* ===================== feedback + timer ===================== */
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms);}catch(e){}}
+let AC=null;function beep(f=900,d=.16){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+  const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='sine';o.connect(g);g.connect(AC.destination);
+  g.gain.setValueAtTime(.001,AC.currentTime);g.gain.exponentialRampToValueAtTime(.4,AC.currentTime+.02);
+  g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d);}catch(e){}}
+
+const Timer=(()=>{const CIRC=2*Math.PI*88;let mode='rest',total=90,left=90,running=false,tick=null;
+  let iv={work:0,rest:0,rounds:1,r:0,phase:'work'};const el={};
+  function c(){el.s=$('#scrim');el.t=$('#tmr-time');el.a=$('#tmr-arc');el.p=$('#tmr-phase');el.h=$('#tmr-title');el.g=$('#tmr-toggle');el.adj=$('#tmr-adj');}
+  function fmt(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+  function draw(){el.t.textContent=fmt(left);el.a.setAttribute('stroke-dashoffset',(CIRC*(1-(total?left/total:0))).toFixed(1));}
+  function rest(sec,name){c();mode='rest';total=sec;left=sec;el.h.textContent='Rest · '+name;el.p.textContent='';el.adj.style.display='';draw();open();start();}
+  function work(sec,label){c();mode='rest';total=sec;left=sec;el.h.textContent='Work · '+label;el.p.textContent='';el.adj.style.display='';draw();open();start();}
+  function interval(w,rst,rounds,label){c();mode='interval';iv={work:w,rest:rst,rounds:rounds,r:1,phase:'work'};
+    el.h.textContent=label+' · interval';el.adj.style.display='none';total=w;left=w;el.p.textContent='Round 1 of '+rounds+' · work';draw();open();start();}
+  function open(){el.s.dataset.open='1';}function close(){stop();el.s.dataset.open='0';}
+  function start(){running=true;el.g.textContent='Pause';clearInterval(tick);let last=Date.now();
+    tick=setInterval(()=>{const n=Date.now();left-=(n-last)/1000;last=n;if(left<=0)zero();draw();},200);}
+  function stop(){running=false;clearInterval(tick);if(el.g)el.g.textContent='Start';}
+  function toggle(){running?stop():start();}function reset(){left=total;draw();stop();}
+  function adjust(d){total=Math.max(5,total+d);left=Math.max(1,left+d);draw();}
+  function zero(){beep(980,.18);buzz([20,60,20]);
+    if(mode==='rest'){stop();left=0;draw();setTimeout(close,500);return;}
+    if(iv.phase==='work'&&iv.rest>0){iv.phase='rest';total=iv.rest;left=iv.rest;el.p.textContent='Round '+iv.r+' of '+iv.rounds+' · rest';return;}
+    if(iv.r>=iv.rounds){stop();beep(660,.3);el.p.textContent='Done';left=0;draw();setTimeout(close,700);return;}
+    iv.r++;iv.phase='work';total=iv.work;left=iv.work;el.p.textContent='Round '+iv.r+' of '+iv.rounds+' · work';}
+  return{rest,work,interval,close,toggle,reset,adjust};})();
+
+/* PWA manifest */
+(function(){const mani={name:'D-10 Trainer',short_name:'D-10',start_url:'.',display:'standalone',background_color:'#0B0F14',theme_color:'#0B0F14'};
+  try{const b=new Blob([JSON.stringify(mani)],{type:'application/manifest+json'});const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(b);document.head.appendChild(l);}catch(e){}})();
+
+render();
+</script>
+</body>
+</html>
