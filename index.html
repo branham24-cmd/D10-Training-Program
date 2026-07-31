@@ -178,7 +178,7 @@
 
   .scrim{position:fixed;inset:0;z-index:60;background:rgba(6,9,13,.72);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
   .scrim[data-open="1"]{display:flex}
-  .sheet{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--line2);border-radius:22px 22px 0 0;
+  .sheet{position:relative;width:100%;max-width:640px;background:var(--panel);border:1px solid var(--line2);border-radius:22px 22px 0 0;
     padding:20px 18px calc(26px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px -20px #000}
   .sheet h3{margin:0 0 2px;font-size:14px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
   .clock{display:grid;place-items:center;margin:10px 0 6px}
@@ -191,7 +191,9 @@
   .tbtn.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
   .tadj{display:flex;gap:8px;justify-content:center;margin-top:12px}
   .tadj button{font-family:var(--mono);font-size:12px;border:1px solid var(--line2);background:var(--panel2);border-radius:999px;padding:8px 14px;color:var(--muted)}
-  .close-x{position:absolute;top:14px;right:16px;font-size:22px;color:var(--muted2);background:none;border:0}
+  .close-x{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:11px;font-size:24px;line-height:1;
+    color:var(--ink);background:var(--panel2);border:1px solid var(--line2);display:grid;place-items:center;z-index:3}
+  .tbtn.done{width:100%;margin-top:10px;background:transparent;color:var(--muted)}
 
   .infobox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-top:14px;line-height:1.55;font-size:13.5px;color:var(--muted)}
   .infobox b{color:var(--ink)} .infobox h4{margin:16px 0 6px;color:var(--ink);font-size:14px} .infobox h4:first-child{margin-top:0}
@@ -211,7 +213,7 @@
   <button class="navbtn" data-nav="program"><span class="ni">&#9636;</span><span class="nl">Program</span></button>
   <button class="navbtn" data-nav="info"><span class="ni">&#8505;</span><span class="nl">Info</span></button>
 </div></nav>
-<div class="scrim" id="scrim"><div class="sheet">
+<div class="scrim" id="scrim" onclick="Timer.bg(event)"><div class="sheet">
   <button class="close-x" onclick="Timer.close()">&times;</button>
   <h3 id="tmr-title">Rest</h3>
   <div class="clock" style="position:relative">
@@ -223,6 +225,7 @@
   </div>
   <div class="tadj" id="tmr-adj"><button onclick="Timer.adjust(-30)">&#8722;30s</button><button onclick="Timer.adjust(30)">+30s</button></div>
   <div class="tctrls"><button class="tbtn" onclick="Timer.reset()">Reset</button><button class="tbtn primary" id="tmr-toggle" onclick="Timer.toggle()">Start</button></div>
+  <button class="tbtn done" onclick="Timer.close()">Done — back to workout</button>
 </div></div>
 
 <script>
@@ -736,6 +739,7 @@ const Timer=(()=>{const CIRC=2*Math.PI*88;let mode='rest',total=90,left=90,runni
   function interval(w,rst,rounds,label){c();mode='interval';iv={work:w,rest:rst,rounds:rounds,r:1,phase:'work'};
     el.h.textContent=label+' · interval';el.adj.style.display='none';total=w;left=w;el.p.textContent='Round 1 of '+rounds+' · work';draw();open();start();}
   function open(){el.s.dataset.open='1';}function close(){stop();el.s.dataset.open='0';}
+  function bg(e){if(e&&e.target&&e.target.id==='scrim')close();}
   function start(){running=true;el.g.textContent='Pause';clearInterval(tick);let last=Date.now();
     tick=setInterval(()=>{const n=Date.now();left-=(n-last)/1000;last=n;if(left<=0)zero();draw();},200);}
   function stop(){running=false;clearInterval(tick);if(el.g)el.g.textContent='Start';}
@@ -746,7 +750,7 @@ const Timer=(()=>{const CIRC=2*Math.PI*88;let mode='rest',total=90,left=90,runni
     if(iv.phase==='work'&&iv.rest>0){iv.phase='rest';total=iv.rest;left=iv.rest;el.p.textContent='Round '+iv.r+' of '+iv.rounds+' · rest';return;}
     if(iv.r>=iv.rounds){stop();beep(660,.3);el.p.textContent='Done';left=0;draw();setTimeout(close,700);return;}
     iv.r++;iv.phase='work';total=iv.work;left=iv.work;el.p.textContent='Round '+iv.r+' of '+iv.rounds+' · work';}
-  return{rest,work,interval,close,toggle,reset,adjust};})();
+  return{rest,work,interval,close,bg,toggle,reset,adjust};})();
 
 /* PWA manifest */
 (function(){const mani={name:'D-10 Trainer',short_name:'D-10',start_url:'.',display:'standalone',background_color:'#0B0F14',theme_color:'#0B0F14'};
